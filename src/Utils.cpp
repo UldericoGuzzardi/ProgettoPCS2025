@@ -301,8 +301,8 @@ bool controllo_lati_vertici (const PolygonalMesh& mesh){
 		for (unsigned int j=0; j<(mesh.Cell2DsEdges[i]).size(); j++){
 			
 			unsigned int id_vertice = mesh.Cell2DsVertices[i][j];
-			unsigned int id_lato=mesh.Cell2DsEdges[i][j];
-			unsigned int id_lato_succ=mesh.Cell2DsEdges[i][(j+1)%(mesh.Cell2DsEdges[i]).size()];
+			unsigned int id_lato = mesh.Cell2DsEdges[i][j];
+			unsigned int id_lato_succ = mesh.Cell2DsEdges[i][(j+1)%(mesh.Cell2DsEdges[i]).size()];
 			unsigned int count =0;
 			
 			//Controllo Lati
