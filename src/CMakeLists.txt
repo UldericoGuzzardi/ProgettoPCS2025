@@ -7,7 +7,7 @@
 # message(${PROJECT_NAME})
 # message(${CMAKE_PROJECT_NAME})
 
-list(APPEND src_headers ${CMAKE_CURRENT_SOURCE_DIR}/PolygonalMesh.hpp)
+list(APPEND src_headers ${CMAKE_CURRENT_SOURCE_DIR}/Polygons.hpp)
 list(APPEND src_headers ${CMAKE_CURRENT_SOURCE_DIR}/Utils.hpp)
 
 
