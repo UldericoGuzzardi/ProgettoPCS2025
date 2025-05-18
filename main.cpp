@@ -11,19 +11,19 @@ using namespace PolygonalLibrary;
 int main(){
 	
 	PolygonalMesh mesh;
-	int q = 5;
-	bool a = costruzione_poliedro(q, mesh);
+	int q = 3;
+	bool pol = costruzione_poliedro(q, mesh);
 	
-	if (!a){
-		cout<<"suca"<<endl;
+	if (!pol){
+		cout<<"Errore nella costruzione del poliedro"<<endl;
 	}
 	
-	bool b = check_ed_vert(mesh);
+	bool contr = check_ed_vert(mesh);
 	
-	if (!b){
-		cout<<"fallisce controllo"<<endl;
+	if (!contr){
+		cout<<"Il controllo di lati e vertici non è andato a buon fine"<<endl;
 	}
-		
+	
 	
 	
 	return 0;

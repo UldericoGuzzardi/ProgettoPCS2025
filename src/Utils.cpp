@@ -265,11 +265,11 @@ bool costruzione_poliedro(int q, PolygonalMesh& mesh){
 		vector<unsigned int> e12 = {19,24,20};
 		vector<unsigned int> e13 = {19,25,18};
 		vector<unsigned int> e14 = {6,25,8};
-		vector<unsigned int> e15 = {6,17,5};
+		vector<unsigned int> e15 = {5,17,6};
 		vector<unsigned int> e16 = {5,14,7};
 		vector<unsigned int> e17 = {7,21,9};
-		vector<unsigned int> e18 = {9,29,8};
-		vector<unsigned int> e19 = {12,29,13};
+		vector<unsigned int> e18 = {8,29,9};
+		vector<unsigned int> e19 = {13,29,12};
 		vector<unsigned int> e20 = {10,18,13};
 		
 		mesh.Cell2DsEdges = {e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20};
