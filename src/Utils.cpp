@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <cmath>
+#include <algorithm>
 
 namespace PolygonalLibrary
 {
@@ -300,19 +301,19 @@ bool check_ed_vert(const PolygonalMesh& mesh){
 	for (unsigned int i=0; i<mesh.NumCell2Ds; i++){
 		for (unsigned int j=0; j<(mesh.Cell2DsEdges[i]).size(); j++){
 			
-			unsigned int id_vertice = mesh.Cell2DsVertices[i][j];
-			unsigned int id_lato = mesh.Cell2DsEdges[i][j];
-			unsigned int id_lato_succ = mesh.Cell2DsEdges[i][(j+1)%(mesh.Cell2DsEdges[i]).size()];
+			unsigned int vert_id = mesh.Cell2DsVertices[i][j];
+			unsigned int ed_id = mesh.Cell2DsEdges[i][j];
+			unsigned int next_ed_id = mesh.Cell2DsEdges[i][(j+1)%(mesh.Cell2DsEdges[i]).size()];
 			unsigned int count =0;
 			
 			//Controllo Lati
-			if (mesh.Cell1DsExtrema(0,id_lato) == mesh.Cell1DsExtrema(0,id_lato_succ))
+			if (mesh.Cell1DsExtrema(0,ed_id) == mesh.Cell1DsExtrema(0,next_ed_id))
 				count++;
-			if (mesh.Cell1DsExtrema(0,id_lato) == mesh.Cell1DsExtrema(1,id_lato_succ))
+			if (mesh.Cell1DsExtrema(0,ed_id) == mesh.Cell1DsExtrema(1,next_ed_id))
 				count++;
-			if (mesh.Cell1DsExtrema(1,id_lato) == mesh.Cell1DsExtrema(0,id_lato_succ))
+			if (mesh.Cell1DsExtrema(1,ed_id) == mesh.Cell1DsExtrema(0,next_ed_id))
 				count++;
-			if (mesh.Cell1DsExtrema(1,id_lato) == mesh.Cell1DsExtrema(1,id_lato_succ))
+			if (mesh.Cell1DsExtrema(1,ed_id) == mesh.Cell1DsExtrema(1,next_ed_id))
 				count++;
 			
 			if (count != 1){
@@ -321,9 +322,9 @@ bool check_ed_vert(const PolygonalMesh& mesh){
 			}
 			
 			// Controllo Vertici
-			if (id_vertice == mesh.Cell1DsExtrema(0,id_lato))
+			if (vert_id == mesh.Cell1DsExtrema(0,ed_id))
 				count++;
-			if (id_vertice == mesh.Cell1DsExtrema(1,id_lato))
+			if (vert_id == mesh.Cell1DsExtrema(1,ed_id))
 				count++;
 			
 			if (count != 2){
@@ -338,6 +339,73 @@ bool check_ed_vert(const PolygonalMesh& mesh){
 	return true;
 }
 
+bool new_vert(vector<array<double,3>>& verts, array<double,3> v0, array<double,3> v1, unsigned int j,unsigned int& count){
+	
+	for (unsigned int i=0; i< j-1; i++){
+		
+		array<double,3> new_vert;
+		new_vert={v0[0]+(v1[0]-v0[0])*(i+1)/j,v0[1]+(v1[1]-v0[1])*(i+1)/j,v0[2]+(v1[2]-v0[2])*(i+1)/j};
+		if (find(verts.begin(), verts.end(), new_vert) == verts.end()) {
+						verts.push_back(new_vert);
+						cout<<"vertice "<<count<<":"<<endl;
+						for (unsigned int j=0;j<3;j++){
+							cout<<new_vert[j]<<" ";
+						}
+						cout<<endl;
+						count++;
+		}
+		
+	}	
+	return true;
+		
+}
 
+vector<array<double,3>> triang_vert(PolygonalMesh& mesh, unsigned int b){
+	vector<array<double,3>> verts;
+	unsigned int count= mesh.NumCell2Ds;
+	for (unsigned int i=0; i<mesh.NumCell2Ds; i++){
+		
+		cout<<"Faccia"<< i<<":"<<endl;
+		cout<<endl;
+		unsigned int id_0 = mesh.Cell2DsVertices[i][0];
+		unsigned int id_1 = mesh.Cell2DsVertices[i][1];
+		unsigned int id_2 = mesh.Cell2DsVertices[i][2];
+		array<double,3> v0= {mesh.Cell0DsCoordinates(0,id_0),mesh.Cell0DsCoordinates(1,id_0),mesh.Cell0DsCoordinates(2,id_0)};
+		array<double,3> v1= {mesh.Cell0DsCoordinates(0,id_1),mesh.Cell0DsCoordinates(1,id_1),mesh.Cell0DsCoordinates(2,id_1)};
+		array<double,3> v2= {mesh.Cell0DsCoordinates(0,id_2),mesh.Cell0DsCoordinates(1,id_2),mesh.Cell0DsCoordinates(2,id_2)};
+		
+		for(unsigned int j=b; j>0; j--){
+			if (new_vert(verts, v0, v1, j,count)){
+				if (j!=1){
+					v0={v0[0]+(v2[0]-v0[0])/b,v0[1]+(v2[1]-v0[1])/b,v0[2]+(v2[2]-v0[2])/b};
+					v1={v1[0]+(v2[0]-v1[0])/b,v1[1]+(v2[1]-v1[1])/b,v1[2]+(v2[2]-v1[2])/b};
+					if (find(verts.begin(), verts.end(), v0) == verts.end()) {
+						verts.push_back(v0);
+						cout<<"vertice "<<count<<":"<<endl;
+						for (unsigned int k=0;k<3;k++){
+							cout<<v0[k]<<" ";
+						}
+						cout<<endl;
+						count++;
+					}
+					if (find(verts.begin(), verts.end(), v1) == verts.end()) {
+						verts.push_back(v1);
+						cout<<"vertice "<<count<<":"<<endl;
+						for (unsigned int k=0;k<3;k++){
+							cout<<v1[k]<<" ";
+						}
+						cout<<endl;
+						count++;
+					}
+				}
+			
+		
+		cout<<endl;
+		
+			}
+		}
+	}
+	return verts;
 
+}
 }
