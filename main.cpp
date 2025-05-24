@@ -24,8 +24,8 @@ int main(){
 		cout<<"Il controllo di lati e vertici non è andato a buon fine"<<endl;
 	}
 	
-	vector<array<double,3>> vertici = triang_vert(mesh, 5);
-	/*
+	vector<array<double,3>> vertici = triang_vert(mesh, 2);
+	
 	unsigned int count = 4;
 	for (unsigned int i=0; i<vertici.size(); i++){
 		cout<<"vertice "<<count<<":"<<endl;
@@ -36,6 +36,5 @@ int main(){
 		cout<<endl;
 		cout<<endl;
 	}
-	*/
 	return 0;
 }
