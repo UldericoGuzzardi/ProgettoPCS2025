@@ -338,7 +338,8 @@ bool check_ed_vert(const PolygonalMesh& mesh){
 	}
 	return true;
 }
-
+//Funzione per trovare i vertici della triangolazione (esclusi quelli "esterni", già esistenti)
+//Ciclo che itera per "strati orizzontali" da b ad 1
 bool new_vert(vector<array<double,3>>& verts, array<double,3> v0, array<double,3> v1, unsigned int j,unsigned int& count){
 	
 	for (unsigned int i=0; i< j-1; i++){
@@ -359,7 +360,7 @@ bool new_vert(vector<array<double,3>>& verts, array<double,3> v0, array<double,3
 	return true;
 		
 }
-
+//Applico e chiamo la funzione definita in precedenza
 vector<array<double,3>> triang_vert(PolygonalMesh& mesh, unsigned int b){
 	vector<array<double,3>> verts;
 	unsigned int count= mesh.NumCell2Ds;
