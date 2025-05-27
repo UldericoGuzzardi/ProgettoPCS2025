@@ -338,13 +338,72 @@ bool check_ed_vert(const PolygonalMesh& mesh){
 	}
 	return true;
 }
+
+
+//Controlla se il nuovo vertice generato esiste già nel tetraedro. Se esiste, non aggiunge nulla e restituisce il suo ID. 
+//Se non esiste, aggiorna NumCell0Ds, Cell0DsId e la matrice con le coordinate
+
+unsigned int EsisteVertice(PolygonalMesh& mesh,const Eigen::Vector3d new_vert)
+{ 
+	for (unsigned int i = 0; i < mesh.NumCell0Ds; ++i) {
+        if (mesh.Cell0DsCoordinates.col(i) == new_vert) { //Se il vertice esiste, allora restituisco il suo ID (bisogna fare un controllo con la tolleranza?)
+            return mesh.Cell0DsId[i];  
+        }
+    }
+
+    //Se siamo arrivati a questo punto allora il vertice non esiste, e il suo ID è uguale al numero corrente di celle
+	//Ricorda che se ci sono n celle, allora l'ultimo ID è pari a n-1
+    unsigned int new_id = mesh.NumCell0Ds; 
+    mesh.NumCell0Ds++; //Aggiorno il numero di celle
+    mesh.Cell0DsId.push_back(new_id); //Aggiungo l'ID nelle Cell0Ds
+    
+    // Aggiungo la nuova colonna con le coordinate alla matrice, adesso le coordinate non servono per la costruzione dei lati e delle facce
+    mesh.Cell0DsCoordinates.conservativeResize(3, mesh.NumCell0Ds); 
+    mesh.Cell0DsCoordinates.col(mesh.NumCell0Ds - 1) = new_vert;
+
+    return new_id;
+}
+	
+}
+
+
+void TriangolaFaccia(PolygonalMesh& mesh, Eigen::Vector3d v0, Eigen::Vector3d v1, Eigen::Vector3d v2, unsigned int id_0, unsigned int id_1, unsigned int id_2, unsigned int b){
+	vector<unsigned int> vertici_faccia; // salvo gli id dei vertici che compongono la faccia
+	
+	vertici_faccia.push_back(id_0); //aggiungo l'ID del vertice "0" della faccia
+	for(unsigned int j=b; j>0; j--){ //Itero sui "piani" del triangolo, il primo verrà diviso in b segmenti, il secondo in b-1 ecc.
+		
+		for (unsigned int i=0; i< j-1; i++){
+		
+		Eigen::Vector3d new_vert={v0[0]+(v1[0]-v0[0])*(i+1)/j, v0[1]+(v1[1]-v0[1])*(i+1)/j, v0[2]+(v1[2]-v0[2])*(i+1)/j};
+		unsigned int new_id = EsisteVertice(mesh, new_vert); 
+		vertici_faccia.push_back(new_id); //aggiungo l'ID del vertice appena creato
+		}
+		
+		if(j==b)
+			vertici_faccia.push_back(id_1); //Alla fine del primo "piano", aggiungo l'ID del vertice "1" della faccia
+	}
+	vertici_faccia.push_back(id_2); //Alla fine di tutto, aggiungo l'ID del vertice "2" della faccia
+		
+}
+
+
+
+
+
+
+
+
+
+
+/*
 //Funzione per trovare i vertici della triangolazione (esclusi quelli "esterni", già esistenti)
 //Ciclo che itera per "strati orizzontali" da b ad 1
-bool new_vert(vector<array<double,3>>& verts, array<double,3> v0, array<double,3> v1, unsigned int j,unsigned int& count){
+bool new_vert(vector<Eigen::Vector3d>& verts, Eigen::Vector3d v0, Eigen::Vector3d v1, unsigned int j,unsigned int& count){
 	
 	for (unsigned int i=0; i< j-1; i++){
 		
-		array<double,3> new_vert;
+		Eigen::Vector3d new_vert;
 		new_vert={v0[0]+(v1[0]-v0[0])*(i+1)/j,v0[1]+(v1[1]-v0[1])*(i+1)/j,v0[2]+(v1[2]-v0[2])*(i+1)/j};
 		if (find(verts.begin(), verts.end(), new_vert) == verts.end()) {
 						verts.push_back(new_vert);
@@ -353,41 +412,44 @@ bool new_vert(vector<array<double,3>>& verts, array<double,3> v0, array<double,3
 							cout<<new_vert[j]<<" ";
 						}
 						cout<<endl;
-						count++;*/
+						count++;
 		}
 		
 	}	
 	return true;
 		
 }
+*/
+
+
 //Applico e chiamo la funzione definita in precedenza
-vector<array<double,3>> triang_vert(PolygonalMesh& mesh, unsigned int b){
-	vector<array<double,3>> verts;
-	unsigned int count= mesh.NumCell2Ds;
-	for (unsigned int i=0; i<mesh.NumCell2Ds; i++){
+void triang_vert(PolygonalMesh& mesh, unsigned int b){
+	for (unsigned int i=0; i<mesh.NumCell2Ds; i++){ //per ogni faccia, salvo i vertici per poter fare la triangolazione
 		
 		//cout<<"Faccia"<< i<<":"<<endl;
 		//cout<<endl;
 		unsigned int id_0 = mesh.Cell2DsVertices[i][0];
 		unsigned int id_1 = mesh.Cell2DsVertices[i][1];
 		unsigned int id_2 = mesh.Cell2DsVertices[i][2];
-		array<double,3> v0= {mesh.Cell0DsCoordinates(0,id_0),mesh.Cell0DsCoordinates(1,id_0),mesh.Cell0DsCoordinates(2,id_0)};
-		array<double,3> v1= {mesh.Cell0DsCoordinates(0,id_1),mesh.Cell0DsCoordinates(1,id_1),mesh.Cell0DsCoordinates(2,id_1)};
-		array<double,3> v2= {mesh.Cell0DsCoordinates(0,id_2),mesh.Cell0DsCoordinates(1,id_2),mesh.Cell0DsCoordinates(2,id_2)};
+		Eigen::Vector3d v0= {mesh.Cell0DsCoordinates(0,id_0),mesh.Cell0DsCoordinates(1,id_0),mesh.Cell0DsCoordinates(2,id_0)};
+		Eigen::Vector3d v1= {mesh.Cell0DsCoordinates(0,id_1),mesh.Cell0DsCoordinates(1,id_1),mesh.Cell0DsCoordinates(2,id_1)};
+		Eigen::Vector3d v2= {mesh.Cell0DsCoordinates(0,id_2),mesh.Cell0DsCoordinates(1,id_2),mesh.Cell0DsCoordinates(2,id_2)};
 		
-		for(unsigned int j=b; j>0; j--){
+		
+		
+		/*for(unsigned int j=b; j>0; j--){
 			if (new_vert(verts, v0, v1, j,count)){
 				if (j!=1){
 					
 					v0={v0[0]+(v2[0]-v0[0])/b,v0[1]+(v2[1]-v0[1])/b,v0[2]+(v2[2]-v0[2])/b};
 					if (find(verts.begin(), verts.end(), v0) == verts.end()) {
 						verts.push_back(v0);
-						/*cout<<"vertice "<<count<<":"<<endl;
+						cout<<"vertice "<<count<<":"<<endl;
 						for (unsigned int k=0;k<3;k++){
 							cout<<v0[k]<<" ";
 						}
 						cout<<endl;
-						count++;*/
+						count++;
 						
 						
 					if (find(verts.begin(), verts.end(), v1) == verts.end() && j!=b) {
@@ -396,12 +458,12 @@ vector<array<double,3>> triang_vert(PolygonalMesh& mesh, unsigned int b){
 					
 					}
 					
-						/*cout<<"vertice "<<count<<":"<<endl;
+						cout<<"vertice "<<count<<":"<<endl;
 						for (unsigned int k=0;k<3;k++){
 							cout<<v1[k]<<" ";
 						}
 						cout<<endl;
-						count++;*/
+						count++;
 					}
 				}
 		
@@ -413,7 +475,7 @@ vector<array<double,3>> triang_vert(PolygonalMesh& mesh, unsigned int b){
 		if (find(verts.begin(), verts.end(), v1) == verts.end()) 
 			verts.push_back(v1);	
 	}
-	return verts;
+	return verts;*/
 
 }
 }
