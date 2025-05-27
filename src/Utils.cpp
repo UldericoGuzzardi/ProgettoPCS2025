@@ -4,6 +4,7 @@
 #include <sstream>
 #include <cmath>
 #include <algorithm>
+#include <utility>
 
 namespace PolygonalLibrary
 {
@@ -63,13 +64,13 @@ bool costruzione_poliedro(int q, PolygonalMesh& mesh){
 		mesh.Cell2DsEdges = {e1, e2, e3, e4};
 		
 		//Cell3Ds
-		mesh.Cell3DsId=0; //caso tetraedro
+		mesh.Cell3DsId=0; 
 		
 		mesh.Cell3DsNumVert = mesh.NumCell0Ds;
 		mesh.Cell3DsNumEdg = mesh.NumCell1Ds;
 		mesh.Cell3DsNumFaces = mesh.NumCell2Ds;
 		
-		mesh.Cell3DsVertices = mesh.Cell0DsId; //costruttore di copia? 
+		mesh.Cell3DsVertices = mesh.Cell0DsId; 
 		mesh.Cell3DsEdges = mesh.Cell1DsId;
 		mesh.Cell3DsFaces = mesh.Cell2DsId;
 		
@@ -79,7 +80,7 @@ bool costruzione_poliedro(int q, PolygonalMesh& mesh){
 	else if (q==4){
 		//Cell0Ds
 		mesh.NumCell0Ds=6;
-		mesh.Cell0DsId = {0,1,2,3,4,5}; // è efficiente? reserve?
+		mesh.Cell0DsId = {0,1,2,3,4,5}; 
 		mesh.Cell0DsCoordinates = Eigen::MatrixXd::Zero(3, mesh.NumCell0Ds);
 		
 		
@@ -369,7 +370,7 @@ unsigned int EsisteVertice(PolygonalMesh& mesh,const Eigen::Vector3d new_vert)
 
 //Controlla se il nuovo lato generato esiste già nel tetraedro. Se esiste, non aggiunge nulla e restituisce il suo ID. 
 //Se non esiste, aggiorna NumCell1Ds, Cell1DsId e la matrice con gli estremi
-unsigned int EsisteLato(PolygonalMesh& mesh, const Eigen::Vector2i new_lato){
+unsigned int EsisteLato(PolygonalMesh& mesh, Eigen::Vector2i new_lato){
 	
 	//Voglio salvare i lati in modo ordinato così come fatto inizialmente nella mesh
 	//Questo permette anche di evitare di salvare due lati identici ma in "direzioni diverse"
@@ -474,7 +475,7 @@ void TriangolaFaccia(PolygonalMesh& mesh, Eigen::Vector3d v0, Eigen::Vector3d v1
 
 
 //Applico e chiamo la funzione definita in precedenza
-void triang_vert(PolygonalMesh& mesh, unsigned int b){
+void TriangolazionePoliedro(PolygonalMesh& mesh, unsigned int b){
 	for (unsigned int i=0; i<mesh.NumCell2Ds; i++){ //per ogni faccia, salvo i vertici per poter fare la triangolazione
 		
 		//cout<<"Faccia"<< i<<":"<<endl;
