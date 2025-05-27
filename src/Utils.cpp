@@ -445,7 +445,7 @@ void TriangolaFaccia(PolygonalMesh& mesh, Eigen::Vector3d v0, Eigen::Vector3d v1
 		//Itero sul numero di vertici dello strato j-esimo
 		for (unsigned int i=0; i<strati_vertici[j].size();i++){ 
 		
-			//Verifico se è possibile costruire il lato orizzontale "verso destra"
+			//Verifico se è possibile costruire il lato orizzontale "verso destra", ossia verificare se si tratta o meno dell'ultimo vertice relativo al piano orizzontale che si sta considerando
 			if (i + 1 < strati_vertici[j].size()){ 
 				
 				Eigen::Vector2i new_lato={strati_vertici[j][i], strati_vertici[j][i+1]};
