@@ -342,9 +342,10 @@ bool check_ed_vert(const PolygonalMesh& mesh){
 
 //Controlla se il nuovo vertice generato esiste già nel tetraedro. Se esiste, non aggiunge nulla e restituisce il suo ID. 
 //Se non esiste, aggiorna NumCell0Ds, Cell0DsId e la matrice con le coordinate
-
 unsigned int EsisteVertice(PolygonalMesh& mesh,const Eigen::Vector3d new_vert)
-{ 
+{
+
+	//devo confrontare tutti i vertici, quindi itero su NumCell0Ds
 	for (unsigned int i = 0; i < mesh.NumCell0Ds; ++i) {
         if (mesh.Cell0DsCoordinates.col(i) == new_vert) { //Se il vertice esiste, allora restituisco il suo ID (bisogna fare un controllo con la tolleranza?)
             return mesh.Cell0DsId[i];  
@@ -364,62 +365,112 @@ unsigned int EsisteVertice(PolygonalMesh& mesh,const Eigen::Vector3d new_vert)
     return new_id;
 }
 	
-}
-
-
-void TriangolaFaccia(PolygonalMesh& mesh, Eigen::Vector3d v0, Eigen::Vector3d v1, Eigen::Vector3d v2, unsigned int id_0, unsigned int id_1, unsigned int id_2, unsigned int b){
-	vector<unsigned int> vertici_faccia; // salvo gli id dei vertici che compongono la faccia
 	
-	vertici_faccia.push_back(id_0); //aggiungo l'ID del vertice "0" della faccia
-	for(unsigned int j=b; j>0; j--){ //Itero sui "piani" del triangolo, il primo verrà diviso in b segmenti, il secondo in b-1 ecc.
-		
-		for (unsigned int i=0; i< j-1; i++){
-		
-		Eigen::Vector3d new_vert={v0[0]+(v1[0]-v0[0])*(i+1)/j, v0[1]+(v1[1]-v0[1])*(i+1)/j, v0[2]+(v1[2]-v0[2])*(i+1)/j};
-		unsigned int new_id = EsisteVertice(mesh, new_vert); 
-		vertici_faccia.push_back(new_id); //aggiungo l'ID del vertice appena creato
-		}
-		
-		if(j==b)
-			vertici_faccia.push_back(id_1); //Alla fine del primo "piano", aggiungo l'ID del vertice "1" della faccia
+
+//Controlla se il nuovo lato generato esiste già nel tetraedro. Se esiste, non aggiunge nulla e restituisce il suo ID. 
+//Se non esiste, aggiorna NumCell1Ds, Cell1DsId e la matrice con gli estremi
+unsigned int EsisteLato(PolygonalMesh& mesh, const Eigen::Vector2i new_lato){
+	
+	//Voglio salvare i lati in modo ordinato così come fatto inizialmente nella mesh
+	//Questo permette anche di evitare di salvare due lati identici ma in "direzioni diverse"
+	//Per esempio, se ho salvato il lato {5,6} e in un'altra faccia avrò il lato {6,5}, questo ordinamento mi permette di salvare il lato solo una volta
+	if (new_lato[0] > new_lato[1]) {
+		swap(new_lato[0], new_lato[1]);
 	}
-	vertici_faccia.push_back(id_2); //Alla fine di tutto, aggiungo l'ID del vertice "2" della faccia
-		
+	
+	
+	//devo confrontare tutti i lati, quindi itero su NumCell1Ds
+	for (unsigned int i = 0; i < mesh.NumCell1Ds; ++i) {
+        if (mesh.Cell1DsExtrema.col(i) == new_lato) { //Se il lato esiste, allora restituisco il suo ID (bisogna fare un controllo con la tolleranza?)
+            return mesh.Cell1DsId[i];  
+        }
+    }
+
+    //Se siamo arrivati a questo punto allora il lato non esiste, e il suo ID è uguale al numero corrente di celle
+	//Ricorda che se ci sono n celle, allora l'ultimo ID è pari a n-1
+    unsigned int new_id = mesh.NumCell1Ds; 
+    mesh.NumCell1Ds++; //Aggiorno il numero di celle
+    mesh.Cell1DsId.push_back(new_id); //Aggiungo l'ID nelle Cell1Ds
+    
+    // Aggiungo la nuova colonna con gli estremi alla matrice
+    mesh.Cell1DsExtrema.conservativeResize(2, mesh.NumCell1Ds); 
+    mesh.Cell1DsExtrema.col(mesh.NumCell1Ds - 1) = new_lato;
+
+    return new_id;
 }
 
 
-
-
-
-
-
-
-
-
-/*
-//Funzione per trovare i vertici della triangolazione (esclusi quelli "esterni", già esistenti)
-//Ciclo che itera per "strati orizzontali" da b ad 1
-bool new_vert(vector<Eigen::Vector3d>& verts, Eigen::Vector3d v0, Eigen::Vector3d v1, unsigned int j,unsigned int& count){
+//Fa la triangolazione della faccia, utilizza le due funzioni definite sopra. 
+//Prende in input la mesh da modificare, i vertici della faccia del poliedro e la quantità b da cui dipende la triangolazione
+void TriangolaFaccia(PolygonalMesh& mesh, Eigen::Vector3d v0, Eigen::Vector3d v1, Eigen::Vector3d v2, unsigned int b){
 	
-	for (unsigned int i=0; i< j-1; i++){
+	//Opero una costruzione dei vertici a strati, ogni volta prendo gli estremi, divido il lato in b parti e 
+	//costruisco i vertici. Poi "salgo di un piano". Salvo quindi in un vettore di vettori gli ID dei vertici di ogni strato	
+	vector<vector<unsigned int>> strati_vertici;
+	
+	//Itero sui "piani" del triangolo, il primo verrà diviso in b segmenti, il secondo in b-1 ecc.
+	for(unsigned int j=0; j<=b; j++){
 		
-		Eigen::Vector3d new_vert;
-		new_vert={v0[0]+(v1[0]-v0[0])*(i+1)/j,v0[1]+(v1[1]-v0[1])*(i+1)/j,v0[2]+(v1[2]-v0[2])*(i+1)/j};
-		if (find(verts.begin(), verts.end(), new_vert) == verts.end()) {
-						verts.push_back(new_vert);
-						/*cout<<"vertice "<<count<<":"<<endl;
-						for (unsigned int j=0;j<3;j++){
-							cout<<new_vert[j]<<" ";
-						}
-						cout<<endl;
-						count++;
+		Eigen::Vector3d new_extreme_0 = v0 + (v2-v0)*(double)j/b; //estremo sinistro del j-esimo strato
+		Eigen::Vector3d new_extreme_1 = v1 + (v2-v1)*(double)j/b; //estremo destro del j-esimo strato
+		
+		vector<unsigned int> strato;
+		
+		if (j==b){
+			unsigned int new_id = EsisteVertice(mesh, new_extreme_0); //nel caso in cui j=b i due estremi coincidono con v2 
+			strato.push_back(new_id);
+			
+		
+		} else { //evito di dividere per 0 per il caso j=b  
+			for (unsigned int i=0; i<=b-j; i++){
+				Eigen::Vector3d new_vert= new_extreme_0 + (new_extreme_1-new_extreme_0)*(double)i/(b-j);
+				unsigned int new_id = EsisteVertice(mesh, new_vert); //verifico se esiste quell'ID
+				strato.push_back(new_id); //aggiungo l'ID del vertice appena creato
+			}
 		}
 		
-	}	
-	return true;
+		//Aggiungo lo strato
+		strati_vertici.push_back(strato); 
 		
-}
-*/
+		
+	}
+	
+	//Adesso ho la suddivisione della faccia in strati, costruisco i lati andando strato per strato
+	
+	vector<unsigned int> nuovi_lati; //qui vado a mettere gli ID dei lati, che mi serviranno per costruire le facce
+	
+	//Itero sul numero di strati
+	for (unsigned int j=0; j<strati_vertici.size(); j++){ 
+	
+		//Itero sul numero di vertici dello strato j-esimo
+		for (unsigned int i=0; i<strati_vertici[j].size();i++){ 
+		
+			//Verifico se è possibile costruire il lato orizzontale "verso destra"
+			if (i + 1 < strati_vertici[j].size()){ 
+				
+				Eigen::Vector2i new_lato={strati_vertici[j][i], strati_vertici[j][i+1]};
+				unsigned int ed_id= EsisteLato(mesh,new_lato); //Se il lato esiste, ottengo il suo ID, altrimenti ne creo uno nuovo 
+				nuovi_lati.push_back(ed_id); //aggiungo l'ID alla lista dei lati
+			}
+			
+				//Verifico se è possibile costruire i due lati diagonali verso il basso,
+				if(j>0){ 
+				
+				//Primo lato, diagonale sinistra
+					Eigen::Vector2i new_lato1={strati_vertici[j][i], strati_vertici[j-1][i]};
+					unsigned int ed_id1= EsisteLato(mesh,new_lato1);
+					nuovi_lati.push_back(ed_id1);
+				
+				//Secondo lato, diagonale destra				
+					Eigen::Vector2i new_lato2={strati_vertici[j][i], strati_vertici[j-1][i+1]};
+					unsigned int ed_id2= EsisteLato(mesh,new_lato2);
+					nuovi_lati.push_back(ed_id2);
+					
+				}
+		}
+	}
+		
+}	
 
 
 //Applico e chiamo la funzione definita in precedenza
@@ -434,48 +485,10 @@ void triang_vert(PolygonalMesh& mesh, unsigned int b){
 		Eigen::Vector3d v0= {mesh.Cell0DsCoordinates(0,id_0),mesh.Cell0DsCoordinates(1,id_0),mesh.Cell0DsCoordinates(2,id_0)};
 		Eigen::Vector3d v1= {mesh.Cell0DsCoordinates(0,id_1),mesh.Cell0DsCoordinates(1,id_1),mesh.Cell0DsCoordinates(2,id_1)};
 		Eigen::Vector3d v2= {mesh.Cell0DsCoordinates(0,id_2),mesh.Cell0DsCoordinates(1,id_2),mesh.Cell0DsCoordinates(2,id_2)};
-		
-		
-		
-		/*for(unsigned int j=b; j>0; j--){
-			if (new_vert(verts, v0, v1, j,count)){
-				if (j!=1){
-					
-					v0={v0[0]+(v2[0]-v0[0])/b,v0[1]+(v2[1]-v0[1])/b,v0[2]+(v2[2]-v0[2])/b};
-					if (find(verts.begin(), verts.end(), v0) == verts.end()) {
-						verts.push_back(v0);
-						cout<<"vertice "<<count<<":"<<endl;
-						for (unsigned int k=0;k<3;k++){
-							cout<<v0[k]<<" ";
-						}
-						cout<<endl;
-						count++;
-						
-						
-					if (find(verts.begin(), verts.end(), v1) == verts.end() && j!=b) {
-						verts.push_back(v1);
-					v1={v1[0]+(v2[0]-v1[0])/b,v1[1]+(v2[1]-v1[1])/b,v1[2]+(v2[2]-v1[2])/b};
-					
-					}
-					
-						cout<<"vertice "<<count<<":"<<endl;
-						for (unsigned int k=0;k<3;k++){
-							cout<<v1[k]<<" ";
-						}
-						cout<<endl;
-						count++;
-					}
-				}
-		
-		
-		cout<<endl;
-		
-			}
-		}
-		if (find(verts.begin(), verts.end(), v1) == verts.end()) 
-			verts.push_back(v1);	
-	}
-	return verts;*/
+		TriangolaFaccia(mesh, v0, v1, v2, b);
 
+	}
+	
+	
 }
 }
