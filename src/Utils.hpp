@@ -20,6 +20,12 @@ void TriangolaFaccia(PolygonalMesh& mesh, Eigen::Vector3d v0, Eigen::Vector3d v1
 
 void TriangolazionePoliedro(PolygonalMesh& mesh, unsigned int b);
 
+Eigen::Vector3d calcolo_baricentro(const PolygonalMesh& mesh, vector<unsigned int> verts);
+
+bool VerticeInFaccia(vector<unsigned int> faccia, unsigned int vertice);
+
+PolygonalMesh costruzione_duale(const PolygonalMesh& mesh, unsigned int num_facce_iniziali, unsigned int num_lati_iniziali);
+
 
 
 }

@@ -145,14 +145,15 @@ bool costruzione_poliedro(int q, PolygonalMesh& mesh){
 		mesh.Cell2DsEdges = {e1, e2, e3, e4, e5, e6, e7, e8};
 		
 		//Cell3D
+		mesh.Cell3DsId=0; 
 		
-		vector<unsigned int> Cell3DsNumVert = {6};
-		vector<unsigned int> Cell3DsNumEdg = {12};
-		vector<unsigned int> Cell3DsNumFaces = {8};
-	
-		vector<unsigned int> Cell3DsVertices = {0, 1, 2, 3, 4, 5};
-		vector<unsigned int> Cell3DsEdges = {0,1,2,3,4,5,6,7,8,9,10,11};
-		vector<unsigned int> Cell3DsFaces = {0, 1 ,2, 3, 4, 5, 6, 7};
+		mesh.Cell3DsNumVert = mesh.NumCell0Ds;
+		mesh.Cell3DsNumEdg = mesh.NumCell1Ds;
+		mesh.Cell3DsNumFaces = mesh.NumCell2Ds;
+		
+		mesh.Cell3DsVertices = mesh.Cell0DsId; 
+		mesh.Cell3DsEdges = mesh.Cell1DsId;
+		mesh.Cell3DsFaces = mesh.Cell2DsId;
 		}
 		
 		
@@ -277,14 +278,15 @@ bool costruzione_poliedro(int q, PolygonalMesh& mesh){
 		mesh.Cell2DsEdges = {e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20};
 		
 		//Cell3D
+		mesh.Cell3DsId=0; 
 		
-		vector<unsigned int> Cell3DsNumVert = {12};
-		vector<unsigned int> Cell3DsNumEdg = {30};
-		vector<unsigned int> Cell3DsNumFaces = {20};
-	
-		vector<unsigned int> Cell3DsVertices = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
-		vector<unsigned int> Cell3DsEdges = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29};
-		vector<unsigned int> Cell3DsFaces = {0, 1 ,2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19};
+		mesh.Cell3DsNumVert = mesh.NumCell0Ds;
+		mesh.Cell3DsNumEdg = mesh.NumCell1Ds;
+		mesh.Cell3DsNumFaces = mesh.NumCell2Ds;
+		
+		mesh.Cell3DsVertices = mesh.Cell0DsId; 
+		mesh.Cell3DsEdges = mesh.Cell1DsId;
+		mesh.Cell3DsFaces = mesh.Cell2DsId;
 		}
 		
 		
@@ -340,11 +342,10 @@ bool check_ed_vert(const PolygonalMesh& mesh){
 	return true;
 }
 
-
 //Controlla se il nuovo vertice generato esiste già nel tetraedro. Se esiste, non aggiunge nulla e restituisce il suo ID. 
 //Se non esiste, aggiorna NumCell0Ds, Cell0DsId e la matrice con le coordinate
-unsigned int EsisteVertice(PolygonalMesh& mesh,const Eigen::Vector3d new_vert)
-{
+unsigned int EsisteVertice(PolygonalMesh& mesh,const Eigen::Vector3d new_vert){
+
 	//Fisso una tolleranza per confrontare i vertici
 	double tol=1e-10;
 
@@ -368,8 +369,6 @@ unsigned int EsisteVertice(PolygonalMesh& mesh,const Eigen::Vector3d new_vert)
     return new_id;
 }
 	
-	
-
 //Controlla se il nuovo lato generato esiste già nel tetraedro. Se esiste, non aggiunge nulla e restituisce il suo ID. 
 //Se non esiste, aggiorna NumCell1Ds, Cell1DsId e la matrice con gli estremi
 unsigned int EsisteLato(PolygonalMesh& mesh, Eigen::Vector2i new_lato){
@@ -548,7 +547,6 @@ void TriangolaFaccia(PolygonalMesh& mesh, Eigen::Vector3d v0, Eigen::Vector3d v1
 		
 }	
 
-
 //Applico e chiamo la funzione definita in precedenza
 void TriangolazionePoliedro(PolygonalMesh& mesh, unsigned int b){
 	unsigned int num_facce=mesh.NumCell2Ds;
@@ -566,6 +564,284 @@ void TriangolazionePoliedro(PolygonalMesh& mesh, unsigned int b){
 
 	}
 	
-	
+	mesh.Cell3DsNumVert = mesh.NumCell0Ds;
+	mesh.Cell3DsNumEdg = mesh.NumCell1Ds;
+	mesh.Cell3DsNumFaces = mesh.NumCell2Ds;
+		
+	mesh.Cell3DsVertices = mesh.Cell0DsId; 
+	mesh.Cell3DsEdges = mesh.Cell1DsId;
+	mesh.Cell3DsFaces = mesh.Cell2DsId;
 }
+
+
+//Scambio di ruolo tra vertici e facce
+//Passi per costruire il duale: 1. costruizione dei baricentri 2. unione tra baricentri di facce adiacenti 
+
+//Calcolo del baricentro di una faccia
+Eigen::Vector3d calcolo_baricentro(const PolygonalMesh& mesh, vector<unsigned int> verts){
+	
+	Eigen::Vector3d v0= {mesh.Cell0DsCoordinates(0,verts[0]),mesh.Cell0DsCoordinates(1,verts[0]),mesh.Cell0DsCoordinates(2,verts[0])};
+	Eigen::Vector3d v1= {mesh.Cell0DsCoordinates(0,verts[1]),mesh.Cell0DsCoordinates(1,verts[1]),mesh.Cell0DsCoordinates(2,verts[1])};
+	Eigen::Vector3d v2= {mesh.Cell0DsCoordinates(0,verts[2]),mesh.Cell0DsCoordinates(1,verts[2]),mesh.Cell0DsCoordinates(2,verts[2])};
+	
+	Eigen::Vector3d baricentro = (v0 + v1 +v2)/3.0;
+	
+	return baricentro;
+}
+
+
+//Funzione che controlla se un vertice sta in una faccia
+bool VerticeInFaccia(vector<unsigned int> faccia, unsigned int vertice){
+	for (unsigned int i=0; i<faccia.size();i++){
+		if(faccia[i]==vertice)
+			return true;
+	}
+	return false;
+}
+
+// Duale triangolare di un poliedro con facce triangolari
+PolygonalMesh costruzione_duale(const PolygonalMesh& mesh, unsigned int num_facce_iniziali, unsigned int num_lati_iniziali){
+	PolygonalMesh duale;
+	
+	//1. Calcolo dei baricentri
+	duale.NumCell0Ds = mesh.NumCell2Ds - num_facce_iniziali;
+	cout<<duale.NumCell0Ds<<endl;
+	duale.Cell0DsCoordinates = Eigen::MatrixXd::Zero(3, duale.NumCell0Ds);
+	
+	for (unsigned int i=0; i<duale.NumCell0Ds; i++){ 
+		duale.Cell0DsId.push_back(i);
+		Eigen::Vector3d baricentro = calcolo_baricentro(mesh, mesh.Cell2DsVertices[num_facce_iniziali+i]);
+		duale.Cell0DsCoordinates.col(i)=baricentro;
+	}
+	
+	//2. Costruzione dei lati
+	duale.NumCell1Ds=mesh.NumCell1Ds - num_lati_iniziali; //Il numero di lati del duale è uguale al numero di lati del poliedro
+	duale.Cell1DsExtrema = Eigen::MatrixXi(2, duale.NumCell1Ds);
+	
+	//tolgo il numero di lati iniziali perché i lati del poliedro prima della triangolazione non sono più lati
+	
+	//Creo una mappa che associa ad ogni lato gli ID della coppia di facce che condividono quel lato (tutto riguardo alla mesh originale)
+	map<vector<unsigned int>, vector<unsigned int>> lati_facce;
+	for (unsigned int i = num_facce_iniziali; i< mesh.NumCell2Ds; i++){
+		vector<unsigned int> vertici = mesh.Cell2DsVertices[i];
+		for (unsigned int j=0; j<3; j++){
+			unsigned int v1 = vertici[j];
+			unsigned int v2 = vertici[(j+1)%3];
+			vector<unsigned int> lato = {min(v1,v2), max(v1,v2)};
+			lati_facce[lato].push_back(i-num_facce_iniziali); //le facce partono da num_facce_iniziali, voglio salvarle partendo da 0
+		}
+	}
+	
+	//Aggiungo i lati al duale
+	unsigned int id_lato=0;
+	
+	for (auto& [lato, facce] : lati_facce){ //Prende ogni elemento della mappa come [chiave, valore], la chiave viene messa in lato e il valore in facce
+											//Ricorda che ogni lato appartiene a due facce
+									
+		//Salvo gli ID delle facce per poi usarli come estremi del lato. Gli ID sono già ordinati in ordine crescente
+		unsigned int v1 = facce[0]; 
+        unsigned int v2 = facce[1];
+		duale.Cell1DsId.push_back(id_lato);
+        duale.Cell1DsExtrema(0,id_lato)=v1;
+		duale.Cell1DsExtrema(1,id_lato)=v2;
+		id_lato++;
+	}
+	
+	
+	//3. Costruzione delle facce 
+	duale.NumCell2Ds=mesh.NumCell0Ds; //Il numero di facce del duale è uguale al numero di vertici del poliedro originale
+	
+	
+	//Crea una mappa che a ogni vertice originale del poliedro (chiave) associa gli ID delle facce a cui quel vertice appartiene (valori)
+	map<unsigned int, vector<unsigned int>> vertici_facce; //mappa che dice tutte le facce dell’originale che hanno come vertice il punto v.
+	
+    //Usando questa lista, si ordinano i baricentri di quelle facce e si costruisce la faccia corrispondente del duale
+	for (unsigned int i= num_facce_iniziali; i < mesh.NumCell2Ds; i++){ //Per ogni faccia
+		vector<unsigned int> verts=mesh.Cell2DsVertices[i]; //Prendo i vertici della faccia
+		
+		for (unsigned int j=0; j<verts.size(); j++){ //Per ogni vertice nella faccia i
+		
+			//Nella mappa aggiungo alla chiave corrispondente all'ID del vertice la faccia i che lo contiene
+			unsigned int vert= verts[j];
+			vertici_facce[vert].push_back(i-num_facce_iniziali); 
+			
+		}
+	}
+	
+	// Costruzione facce duali per ogni vertice originale
+	for (unsigned int i = 0; i < mesh.NumCell0Ds; i++) {
+		vector<unsigned int> facce = vertici_facce[i]; //prendo la lista di facce che hanno i come vertice
+		if (facce.size() < 3) continue; // Non formano una faccia chiusa
+
+		// Costruisco una mappa che ad ogni faccia triangolare del poliedro associa le facce adiacenti ad essa lungo un lato che contiene il vertice i
+		map<unsigned int, vector<unsigned int>> adiacenti;
+		
+		//Ogni faccia del poliedro adesso è un vertice del duale, grazie al baricentro
+		for (unsigned int f = num_facce_iniziali; f < mesh.NumCell2Ds; f++) {//f è l'ID della faccia del poliedro, che riscalato mi darà l'ID del vertice del duale
+			vector<unsigned int> verts = mesh.Cell2DsVertices[f];
+
+			// Se la faccia contiene il vertice
+			if (VerticeInFaccia(verts,i)) {
+				// Per ogni lato della faccia
+				for (int j = 0; j < 3; j++) {
+					unsigned int v1 = verts[j];
+					unsigned int v2 = verts[(j+1)%3];
+
+					if (v1 != i && v2 != i) continue; // deve contenere il vertice i
+
+					vector<unsigned int> lato = {std::min(v1, v2), std::max(v1, v2)};
+					vector<unsigned int> facce_adiacenti = lati_facce[lato];
+
+					for (unsigned int k=0; k<facce_adiacenti.size(); k++) {
+						
+						if ((facce_adiacenti[k] != f - num_facce_iniziali) && VerticeInFaccia(facce,facce_adiacenti[k])) {
+							
+							adiacenti[f - num_facce_iniziali].push_back(facce_adiacenti[k]);
+						}
+					}
+				}
+			}
+		}
+		//Adesso ho una mappa che ad ogni baricentro associa le facce adiacenti che lo contengono
+		
+		vector<unsigned int> baricentri_ordinati; //riordino i baricentri
+		vector<unsigned int> baricentri_visitati; //salvo i baricentri visitati
+
+		unsigned int centro = facce[0];
+		baricentri_ordinati.push_back(centro);
+		baricentri_visitati.push_back(centro);
+
+		while (baricentri_ordinati.size() < facce.size()) {
+			for (unsigned int j=0; j< adiacenti[centro].size();j++) {
+				if (!VerticeInFaccia(baricentri_visitati, adiacenti[centro][j])) { // controllo se è già stato visitato (uso la funzione VerticeInFaccia che si adatta bene)
+					baricentri_ordinati.push_back(adiacenti[centro][j]);
+					baricentri_visitati.push_back(adiacenti[centro][j]);
+					centro = adiacenti[centro][j];
+					break;
+				}
+			}
+		}
+		
+		duale.Cell2DsId.push_back(i);
+		duale.Cell2DsVertices.push_back(baricentri_ordinati);
+		duale.Cell2DsNumVert.push_back(baricentri_ordinati.size());
+		
+		vector<unsigned int> lati_duale;
+		for (unsigned int j = 0; j < baricentri_ordinati.size(); j++) {
+			unsigned int v0 = baricentri_ordinati[j];
+			unsigned int v1 = baricentri_ordinati[(j + 1) % baricentri_ordinati.size()];
+			Eigen::Vector2i lato(v0, v1);
+			unsigned int id_lato = EsisteLato(duale, lato);
+			lati_duale.push_back(id_lato);
+		}
+		duale.Cell2DsEdges.push_back(lati_duale);
+		duale.Cell2DsNumEdg.push_back(lati_duale.size());
+
+	}
+		
+	duale.Cell3DsId=0;
+	
+	duale.Cell3DsNumVert = duale.NumCell0Ds;
+	duale.Cell3DsNumEdg = duale.NumCell1Ds;
+	duale.Cell3DsNumFaces = duale.NumCell2Ds;
+		
+	duale.Cell3DsVertices = duale.Cell0DsId; 
+	duale.Cell3DsEdges = duale.Cell1DsId;
+	duale.Cell3DsFaces = duale.Cell2DsId;
+	
+	return duale;
+}
+
+/*for (const auto& [vtx_idx, face_indices] : vertex_to_faces) { //scorre tutti i vertici del poliedro originale e per ognuno prende la lista delle facce che lo toccano.
+
+		//Per ogni vertice: prende il suo numero identificativo (vtx_idx),
+		//prende la lista di tutte le facce che condividono quel vertice (face_indices) e dentro il ciclo si lavora con questi
+
+        int n = face_indices.size();
+        if (n < 3) continue; // non si può formare una faccia valida
+		
+		//Definiamo un sistema di riferimento locale nel piano tangente alla sfera
+		//E' stato neccesario definire il piano tangente in modo da passare da uno spazio 3D (nel quale è assente il concetto di
+		//orientamento in senso antiorario) ad uno 2D, per semplificare l'ordinamento dei baricentri
+		const Vertex& center = mesh.vertices[vtx_idx];
+		Vertex nvec = center;
+		normalize(nvec);
+
+		//3.1 Base ortonormale nel piano tangente
+		//Primo asse u, ortogonale a nvec
+		Vertex u = {-center.y, center.x, 0.0};
+		double len_u = std::sqrt(u.x*u.x + u.y*u.y + u.z*u.z);
+		if (len_u < 1e-6) u = {1, 0, 0};
+		else {u.x /= len_u; u.y /= len_u; u.z /= len_u;}
+		
+		//Secondo asse v, ortogonale sia a nvec che a u, definito come il loro prodotto vettoriale
+		Vertex v = {
+			nvec.y * u.z - nvec.z * u.y,
+			nvec.z * u.x - nvec.x * u.z,
+			nvec.x * u.y - nvec.y * u.x
+		};
+        
+		//Calcolo dell'angolo polare di ogni baricentro rispetto al vertice center
+		//L'angolo verrà usasto per ordinare i baricentri in senso antiorario attorno a V
+		std::vector<std::pair<double, int>> angle_index_pairs;
+
+        for (int face_idx : face_indices) {
+            Vertex bary = dual.vertices[face_idx]; // già calcolati
+            
+			//Vettore dal centro al baricentro
+			Vertex rel = {bary.x - center.x, bary.y - center.y, bary.z - center.z};
+			
+			//Proiezione nel piano tangente
+            double x = rel.x * u.x + rel.y * u.y + rel.z * u.z;
+            double y = rel.x * v.x + rel.y * v.y + rel.z * v.z;
+
+            double angle = std::atan2(y, x); //angolo polare nel piano (rispetto a u) 
+            angle_index_pairs.emplace_back(angle, face_idx); //salva angolo e indice faccia
+        }
+		
+		//Ordina i baricentri attorno al vertice in senso antiorario
+        std::sort(angle_index_pairs.begin(), angle_index_pairs.end());
+
+        // Costruisce faccia (triangolazione "a ventaglio") (con baricentri ordinati)
+		//Modo geometrico di costruire una faccia compasta da triangoli a partire da un punto centrale
+        for (int i = 1; i + 1 < (int)angle_index_pairs.size(); ++i) {
+            int a = angle_index_pairs[0].second; //.second serve per recuperare l'indice della faccia corrispondente a quell'angolo
+            int b = angle_index_pairs[i].second;
+            int c = angle_index_pairs[i + 1].second;
+            
+			//Aggiunta della faccia al duale
+			dual.faces.push_back({a, b, c});
+			
+			//Aggiunta dei lati al duale
+			dual.edges.insert(Edge(a,b));
+			dual.edges.insert(Edge(b,c));
+			dual.edges.insert(Edge(c,a));
+        }
+	}*/
+	
+	
+//Proiezione dei vertici sulla sfera unitaria (da fare??)
+/*void normalize(Vertex& v){
+	double len = std::sqrt(v.x *v.x + v.y*v.y +v.z*v.z);
+	if (len != 0.0){
+		v.x /= len;
+		v.y /= len;
+		v.z /= len; //se usiamo i nostri vertici, dobbiamo comunque proiettarli(?)
+	}
+}
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
