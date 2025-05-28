@@ -345,10 +345,12 @@ bool check_ed_vert(const PolygonalMesh& mesh){
 //Se non esiste, aggiorna NumCell0Ds, Cell0DsId e la matrice con le coordinate
 unsigned int EsisteVertice(PolygonalMesh& mesh,const Eigen::Vector3d new_vert)
 {
+	//Fisso una tolleranza per confrontare i vertici
+	double tol=1e-10;
 
 	//devo confrontare tutti i vertici, quindi itero su NumCell0Ds
 	for (unsigned int i = 0; i < mesh.NumCell0Ds; ++i) {
-        if (mesh.Cell0DsCoordinates.col(i) == new_vert) { //Se il vertice esiste, allora restituisco il suo ID (bisogna fare un controllo con la tolleranza?)
+        if ((mesh.Cell0DsCoordinates.col(i) - new_vert).norm()<tol) { //Se il vertice esiste, allora restituisco il suo ID (bisogna fare un controllo con la tolleranza?)
             return mesh.Cell0DsId[i];  
         }
     }
@@ -470,6 +472,88 @@ void TriangolaFaccia(PolygonalMesh& mesh, Eigen::Vector3d v0, Eigen::Vector3d v1
 				}
 		}
 	}
+	
+	/*
+	//Costruisco le facce
+	//Anche in questo caso andiamo per strati, prendiamo due strati di vertici successivi, possiamo costruire dei parallelogrammi con quattro vertici, per poi dividerli
+	//in due parti e fare i triangoli. Fuori da questi parallelogrammi c'è sempre un ultimo triangolo fatto dagli ultimi due vertici dello strato inferiore e l'ultimo 
+	//vertice dello strato superiore
+	for (unsigned int j=0; j<strati_vertici.size()-1; j++){
+		for (unsigned int i=0; i<strati_vertici[j].size()-2; i++){
+			
+			//vertici dello strato inferiore
+			unsigned int u0=strati_vertici[j][i];
+			unsigned int u1=strati_vertici[j][i+1];
+			
+			//vertici dello strato superiorie
+			unsigned int w0=strati_vertici[j+1][i];
+			unsigned int w1=strati_vertici[j+1][i+1];
+			
+			//lati
+			Eigen::Vector2i l1={u0, u1};
+			Eigen::Vector2i l2={u1, w0};
+			Eigen::Vector2i l3={u0, w0};
+			Eigen::Vector2i l4={u1, w1};
+			Eigen::Vector2i l5={w0, w1};
+			
+			
+			//Primo triangolo u0,u1,w0
+			
+			vector<unsigned int> verts1={u0,u1,w0}; //vertici della faccia
+			vector<unsigned int> edges1={EsisteLato(mesh, l1), EsisteLato(mesh, l2), EsisteLato(mesh,l3)};
+			//Lati della faccia, EisteLato restituisce l'ID del lato che congiunge i due vertici
+			
+			//Aggiungo lati, vertici, aggiorno il numero di celle e gli ID
+			mesh.Cell2DsId.push_back(mesh.NumCell2Ds);
+			mesh.Cell2DsVertices.push_back(verts1);
+			mesh.Cell2DsEdges.push_back(edges1);
+			mesh.Cell2DsNumVert.push_back(3);
+			mesh.Cell2DsNumEdg.push_back(3);
+			mesh.NumCell2Ds++;
+			
+			
+			//Secondo triangolo 
+			vector<unsigned int> verts2={u1,w1,w0};
+			vector<unsigned int> edges2={EsisteLato(mesh, l4), EsisteLato(mesh, l5), EsisteLato(mesh,l2)};
+			
+			//Aggiungo lati, vertici, aggiorno il numero di celle e gli ID
+			mesh.Cell2DsId.push_back(mesh.NumCell2Ds);
+			mesh.Cell2DsVertices.push_back(verts2);
+			mesh.Cell2DsEdges.push_back(edges2);
+			mesh.Cell2DsNumVert.push_back(3);
+			mesh.Cell2DsNumEdg.push_back(3);
+			mesh.NumCell2Ds++;
+			
+			
+		}
+		//Adesso dobbiamo costruire l'ultima faccia, prenderemo i due ultimi vertici dello strato j e l'ultimo vertice dello strato j+1
+		//Avendo iterato con j che va da 0 e j strettamente minore del numero di strati - 1, non abbiamo problemi con il j+1
+		
+		//vertici
+		unsigned int z0 = strati_vertici[j][strati_vertici[j].size()-2];
+		unsigned int z1 = strati_vertici[j][strati_vertici[j].size()-1];
+		unsigned int z2 = strati_vertici[j+1][strati_vertici[j+1].size()-1];
+		
+		//lati
+		Eigen::Vector2i ed1={z0, z1};
+		Eigen::Vector2i ed2={z1, z2};
+		Eigen::Vector2i ed3={z2, z0};
+		
+		//faccia
+		vector<unsigned int> verts={z0,z1,z2};
+		vector<unsigned int> edges={EsisteLato(mesh, ed1), EsisteLato(mesh, ed2), EsisteLato(mesh,ed3)};
+		
+		mesh.Cell2DsId.push_back(mesh.NumCell2Ds);
+		mesh.Cell2DsVertices.push_back(verts);
+		mesh.Cell2DsEdges.push_back(edges);
+		mesh.Cell2DsNumVert.push_back(3);
+		mesh.Cell2DsNumEdg.push_back(3);
+		mesh.NumCell2Ds++;
+		
+		
+		
+		
+	}*/
 		
 }	
 
