@@ -20,4 +20,6 @@ void TriangolaFaccia(PolygonalMesh& mesh, Eigen::Vector3d v0, Eigen::Vector3d v1
 
 void TriangolazionePoliedro(PolygonalMesh& mesh, unsigned int b);
 
+
+
 }

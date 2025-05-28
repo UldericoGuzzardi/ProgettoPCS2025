@@ -302,7 +302,7 @@ bool check_ed_vert(const PolygonalMesh& mesh){
 	for (unsigned int i=0; i<mesh.NumCell2Ds; i++){
 		for (unsigned int j=0; j<(mesh.Cell2DsEdges[i]).size(); j++){
 			
-			unsigned int vert_id = mesh.Cell2DsVertices[i][j];
+			int vert_id = mesh.Cell2DsVertices[i][j];
 			unsigned int ed_id = mesh.Cell2DsEdges[i][j];
 			unsigned int next_ed_id = mesh.Cell2DsEdges[i][(j+1)%(mesh.Cell2DsEdges[i]).size()];
 			unsigned int count =0;
@@ -388,6 +388,8 @@ unsigned int EsisteLato(PolygonalMesh& mesh, Eigen::Vector2i new_lato){
             return mesh.Cell1DsId[i];  
         }
     }
+	
+
 
     //Se siamo arrivati a questo punto allora il lato non esiste, e il suo ID è uguale al numero corrente di celle
 	//Ricorda che se ci sono n celle, allora l'ultimo ID è pari a n-1
@@ -401,7 +403,6 @@ unsigned int EsisteLato(PolygonalMesh& mesh, Eigen::Vector2i new_lato){
 
     return new_id;
 }
-
 
 //Fa la triangolazione della faccia, utilizza le due funzioni definite sopra. 
 //Prende in input la mesh da modificare, i vertici della faccia del poliedro e la quantità b da cui dipende la triangolazione
@@ -440,8 +441,6 @@ void TriangolaFaccia(PolygonalMesh& mesh, Eigen::Vector3d v0, Eigen::Vector3d v1
 	
 	//Adesso ho la suddivisione della faccia in strati, costruisco i lati andando strato per strato
 	
-	vector<unsigned int> nuovi_lati; //qui vado a mettere gli ID dei lati, che mi serviranno per costruire le facce
-	
 	//Itero sul numero di strati
 	for (unsigned int j=0; j<strati_vertici.size(); j++){ 
 	
@@ -453,7 +452,6 @@ void TriangolaFaccia(PolygonalMesh& mesh, Eigen::Vector3d v0, Eigen::Vector3d v1
 				
 				Eigen::Vector2i new_lato={strati_vertici[j][i], strati_vertici[j][i+1]};
 				unsigned int ed_id= EsisteLato(mesh,new_lato); //Se il lato esiste, ottengo il suo ID, altrimenti ne creo uno nuovo 
-				nuovi_lati.push_back(ed_id); //aggiungo l'ID alla lista dei lati
 			}
 			
 				//Verifico se è possibile costruire i due lati diagonali verso il basso,
@@ -462,25 +460,22 @@ void TriangolaFaccia(PolygonalMesh& mesh, Eigen::Vector3d v0, Eigen::Vector3d v1
 				//Primo lato, diagonale sinistra
 					Eigen::Vector2i new_lato1={strati_vertici[j][i], strati_vertici[j-1][i]};
 					unsigned int ed_id1= EsisteLato(mesh,new_lato1);
-					nuovi_lati.push_back(ed_id1);
 				
 				//Secondo lato, diagonale destra				
 					Eigen::Vector2i new_lato2={strati_vertici[j][i], strati_vertici[j-1][i+1]};
 					unsigned int ed_id2= EsisteLato(mesh,new_lato2);
-					nuovi_lati.push_back(ed_id2);
 					
 				}
 		}
 	}
 	
-	/*
+	
 	//Costruisco le facce
 	//Anche in questo caso andiamo per strati, prendiamo due strati di vertici successivi, possiamo costruire dei parallelogrammi con quattro vertici, per poi dividerli
 	//in due parti e fare i triangoli. Fuori da questi parallelogrammi c'è sempre un ultimo triangolo fatto dagli ultimi due vertici dello strato inferiore e l'ultimo 
 	//vertice dello strato superiore
 	for (unsigned int j=0; j<strati_vertici.size()-1; j++){
 		for (unsigned int i=0; i<strati_vertici[j].size()-2; i++){
-			
 			//vertici dello strato inferiore
 			unsigned int u0=strati_vertici[j][i];
 			unsigned int u1=strati_vertici[j][i+1];
@@ -524,7 +519,7 @@ void TriangolaFaccia(PolygonalMesh& mesh, Eigen::Vector3d v0, Eigen::Vector3d v1
 			mesh.Cell2DsNumEdg.push_back(3);
 			mesh.NumCell2Ds++;
 			
-			
+		
 		}
 		//Adesso dobbiamo costruire l'ultima faccia, prenderemo i due ultimi vertici dello strato j e l'ultimo vertice dello strato j+1
 		//Avendo iterato con j che va da 0 e j strettamente minore del numero di strati - 1, non abbiamo problemi con il j+1
@@ -548,19 +543,16 @@ void TriangolaFaccia(PolygonalMesh& mesh, Eigen::Vector3d v0, Eigen::Vector3d v1
 		mesh.Cell2DsEdges.push_back(edges);
 		mesh.Cell2DsNumVert.push_back(3);
 		mesh.Cell2DsNumEdg.push_back(3);
-		mesh.NumCell2Ds++;
-		
-		
-		
-		
-	}*/
+		mesh.NumCell2Ds++;							
+	}
 		
 }	
 
 
 //Applico e chiamo la funzione definita in precedenza
 void TriangolazionePoliedro(PolygonalMesh& mesh, unsigned int b){
-	for (unsigned int i=0; i<mesh.NumCell2Ds; i++){ //per ogni faccia, salvo i vertici per poter fare la triangolazione
+	unsigned int num_facce=mesh.NumCell2Ds;
+	for (unsigned int i=0; i<num_facce; i++){ //per ogni faccia, salvo i vertici, i lati e le nuove facce della triangolazione
 		
 		//cout<<"Faccia"<< i<<":"<<endl;
 		//cout<<endl;
