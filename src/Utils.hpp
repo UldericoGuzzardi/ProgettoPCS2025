@@ -26,6 +26,8 @@ bool VerticeInFaccia(vector<unsigned int> faccia, unsigned int vertice);
 
 PolygonalMesh costruzione_duale(const PolygonalMesh& mesh, unsigned int num_facce_iniziali, unsigned int num_lati_iniziali);
 
+void ProiezioneSfera(PolygonalMesh& mesh);
+
 
 
 }

@@ -13,9 +13,9 @@ int main(){
 	PolygonalMesh mesh;
 	PolygonalMesh duale;
 	
-	unsigned int p = 5;
+	unsigned int p=4;
 	unsigned int q =3;
-	unsigned int b=4;
+	unsigned int b=3;
 	//unsigned int c=0;
 	
 	unsigned int num_facce_iniziali;
@@ -39,6 +39,7 @@ int main(){
 			num_facce_iniziali = mesh.NumCell2Ds;
 			num_lati_iniziali= mesh.NumCell1Ds;
 			TriangolazionePoliedro(mesh, b);
+			ProiezioneSfera(mesh);
 		}
 		Gedim::UCDUtilities utilities;
 		{ 
@@ -82,6 +83,7 @@ int main(){
 			
 			}
 			duale = costruzione_duale(mesh, num_facce_iniziali, num_lati_iniziali);
+			ProiezioneSfera(duale);
 			
 			if (!check_ed_vert(duale)){
 				cout<<"Errore nel controllo di lati e vertici del poliedro"<<endl;

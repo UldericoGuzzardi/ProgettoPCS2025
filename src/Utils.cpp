@@ -773,96 +773,27 @@ PolygonalMesh costruzione_duale(const PolygonalMesh& mesh, unsigned int num_facc
 	return duale;
 }
 
-/*for (const auto& [vtx_idx, face_indices] : vertex_to_faces) { //scorre tutti i vertici del poliedro originale e per ognuno prende la lista delle facce che lo toccano.
-
-		//Per ogni vertice: prende il suo numero identificativo (vtx_idx),
-		//prende la lista di tutte le facce che condividono quel vertice (face_indices) e dentro il ciclo si lavora con questi
-
-        int n = face_indices.size();
-        if (n < 3) continue; // non si può formare una faccia valida
-		
-		//Definiamo un sistema di riferimento locale nel piano tangente alla sfera
-		//E' stato neccesario definire il piano tangente in modo da passare da uno spazio 3D (nel quale è assente il concetto di
-		//orientamento in senso antiorario) ad uno 2D, per semplificare l'ordinamento dei baricentri
-		const Vertex& center = mesh.vertices[vtx_idx];
-		Vertex nvec = center;
-		normalize(nvec);
-
-		//3.1 Base ortonormale nel piano tangente
-		//Primo asse u, ortogonale a nvec
-		Vertex u = {-center.y, center.x, 0.0};
-		double len_u = std::sqrt(u.x*u.x + u.y*u.y + u.z*u.z);
-		if (len_u < 1e-6) u = {1, 0, 0};
-		else {u.x /= len_u; u.y /= len_u; u.z /= len_u;}
-		
-		//Secondo asse v, ortogonale sia a nvec che a u, definito come il loro prodotto vettoriale
-		Vertex v = {
-			nvec.y * u.z - nvec.z * u.y,
-			nvec.z * u.x - nvec.x * u.z,
-			nvec.x * u.y - nvec.y * u.x
-		};
-        
-		//Calcolo dell'angolo polare di ogni baricentro rispetto al vertice center
-		//L'angolo verrà usasto per ordinare i baricentri in senso antiorario attorno a V
-		std::vector<std::pair<double, int>> angle_index_pairs;
-
-        for (int face_idx : face_indices) {
-            Vertex bary = dual.vertices[face_idx]; // già calcolati
-            
-			//Vettore dal centro al baricentro
-			Vertex rel = {bary.x - center.x, bary.y - center.y, bary.z - center.z};
-			
-			//Proiezione nel piano tangente
-            double x = rel.x * u.x + rel.y * u.y + rel.z * u.z;
-            double y = rel.x * v.x + rel.y * v.y + rel.z * v.z;
-
-            double angle = std::atan2(y, x); //angolo polare nel piano (rispetto a u) 
-            angle_index_pairs.emplace_back(angle, face_idx); //salva angolo e indice faccia
-        }
-		
-		//Ordina i baricentri attorno al vertice in senso antiorario
-        std::sort(angle_index_pairs.begin(), angle_index_pairs.end());
-
-        // Costruisce faccia (triangolazione "a ventaglio") (con baricentri ordinati)
-		//Modo geometrico di costruire una faccia compasta da triangoli a partire da un punto centrale
-        for (int i = 1; i + 1 < (int)angle_index_pairs.size(); ++i) {
-            int a = angle_index_pairs[0].second; //.second serve per recuperare l'indice della faccia corrispondente a quell'angolo
-            int b = angle_index_pairs[i].second;
-            int c = angle_index_pairs[i + 1].second;
-            
-			//Aggiunta della faccia al duale
-			dual.faces.push_back({a, b, c});
-			
-			//Aggiunta dei lati al duale
-			dual.edges.insert(Edge(a,b));
-			dual.edges.insert(Edge(b,c));
-			dual.edges.insert(Edge(c,a));
-        }
-	}*/
+//Proiezione dei vertici sulla sfera unitaria
+void ProiezioneSfera(PolygonalMesh& mesh){
 	
-	
-//Proiezione dei vertici sulla sfera unitaria (da fare??)
-/*void normalize(Vertex& v){
-	double len = std::sqrt(v.x *v.x + v.y*v.y +v.z*v.z);
-	if (len != 0.0){
-		v.x /= len;
-		v.y /= len;
-		v.z /= len; //se usiamo i nostri vertici, dobbiamo comunque proiettarli(?)
+	//Si accede alle coordinate di ogni vertice nella matrice mesh.Cell0DsCoordinates e si normalizzano
+	for (unsigned int i=0; i < mesh.NumCell0Ds; i++){
+		
+		//coordinate del vertice i
+		double v_x = mesh.Cell0DsCoordinates(0,i);
+		double v_y = mesh.Cell0DsCoordinates(1,i);
+		double v_z = mesh.Cell0DsCoordinates(2,i);
+		
+		//calcolo la norma
+		double norma= sqrt(v_x * v_x + v_y * v_y + v_z * v_z);
+		
+		//modifico le coordinate
+		mesh.Cell0DsCoordinates(0,i)= mesh.Cell0DsCoordinates(0,i)/norma;
+		mesh.Cell0DsCoordinates(1,i)= mesh.Cell0DsCoordinates(1,i)/norma;
+		mesh.Cell0DsCoordinates(2,i)= mesh.Cell0DsCoordinates(2,i)/norma;
+		
 	}
-}
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	}
+	
+	
 }
