@@ -605,7 +605,6 @@ PolygonalMesh costruzione_duale(const PolygonalMesh& mesh, unsigned int num_facc
 	
 	//1. Calcolo dei baricentri
 	duale.NumCell0Ds = mesh.NumCell2Ds - num_facce_iniziali;
-	cout<<duale.NumCell0Ds<<endl;
 	duale.Cell0DsCoordinates = Eigen::MatrixXd::Zero(3, duale.NumCell0Ds);
 	
 	for (unsigned int i=0; i<duale.NumCell0Ds; i++){ 
@@ -677,43 +676,57 @@ PolygonalMesh costruzione_duale(const PolygonalMesh& mesh, unsigned int num_facc
 		map<unsigned int, vector<unsigned int>> adiacenti;
 		
 		//Ogni faccia del poliedro adesso è un vertice del duale, grazie al baricentro
+		//Prendo tutte le facce che contengono il vertice i
 		for (unsigned int f = num_facce_iniziali; f < mesh.NumCell2Ds; f++) {//f è l'ID della faccia del poliedro, che riscalato mi darà l'ID del vertice del duale
 			vector<unsigned int> verts = mesh.Cell2DsVertices[f];
 
-			// Se la faccia contiene il vertice
+			// Se la faccia f contiene il vertice i 
 			if (VerticeInFaccia(verts,i)) {
-				// Per ogni lato della faccia
+				
+				// Prendo due vertici all'interno della faccia triangolare, uno dei due deve essere il vertice i
 				for (int j = 0; j < 3; j++) {
 					unsigned int v1 = verts[j];
 					unsigned int v2 = verts[(j+1)%3];
 
 					if (v1 != i && v2 != i) continue; // deve contenere il vertice i
 
-					vector<unsigned int> lato = {std::min(v1, v2), std::max(v1, v2)};
-					vector<unsigned int> facce_adiacenti = lati_facce[lato];
-
-					for (unsigned int k=0; k<facce_adiacenti.size(); k++) {
+					vector<unsigned int> lato = {std::min(v1, v2), std::max(v1, v2)}; //riscrivo il lato che contiene il vertice i e un altro vertice
+					vector<unsigned int> facce_adiacenti = lati_facce[lato]; //prendo le facce adiacenti che hanno quel lato
+					
+					//ciclo sulle due facce adiacenti al lato
+					for (unsigned int k=0; k< facce_adiacenti.size(); k++) { 
+						//itero sulle due facce adiacenti e 
 						
+						//controllo che la faccia da aggiungere non sia la f che sto già considerando, e controllo che abbia i come vertice
 						if ((facce_adiacenti[k] != f - num_facce_iniziali) && VerticeInFaccia(facce,facce_adiacenti[k])) {
 							
+							//se la condizione si verifica, aggiungo la faccia alle facce adiacenti ad f tramite un lato che contiene i
 							adiacenti[f - num_facce_iniziali].push_back(facce_adiacenti[k]);
 						}
 					}
 				}
 			}
 		}
-		//Adesso ho una mappa che ad ogni baricentro associa le facce adiacenti che lo contengono
+		//adiacenti contiene al massimo due elementi per faccia, e non sono ordinati in nessun modo, questa mappa però serve per ordinare i baricentri 
 		
+		
+		//Adesso ho una mappa che ad ogni baricentro associa le facce adiacenti che lo contengono
 		vector<unsigned int> baricentri_ordinati; //riordino i baricentri
 		vector<unsigned int> baricentri_visitati; //salvo i baricentri visitati
 
-		unsigned int centro = facce[0];
-		baricentri_ordinati.push_back(centro);
+		unsigned int centro = facce[0]; //inizio dal primo baricentro, prendendo la prima faccia associata al vertice i nel poliedro originale
+		//in generale, centro ha il ruolo di "ultimo baricentro inserito nella lista dei vertici"
+		baricentri_ordinati.push_back(centro); 
 		baricentri_visitati.push_back(centro);
 
-		while (baricentri_ordinati.size() < facce.size()) {
-			for (unsigned int j=0; j< adiacenti[centro].size();j++) {
-				if (!VerticeInFaccia(baricentri_visitati, adiacenti[centro][j])) { // controllo se è già stato visitato (uso la funzione VerticeInFaccia che si adatta bene)
+		while (baricentri_ordinati.size() < facce.size()) {//non mi fermo finché non ho aggiunto tutti i baricentri
+		
+			for (unsigned int j=0; j< adiacenti[centro].size();j++) { //per il baricentro fissato, prendo le facce adiacenti che adesso sono i vertici vicini
+			
+				if (!VerticeInFaccia(baricentri_visitati, adiacenti[centro][j])) { // controllo se il vertice vicino è già stato visitato 
+				//(uso la funzione VerticeInFaccia che si adatta bene)
+				
+					//se non l'ho già visitato, lo aggiungo, e al prossimo ciclo vedrò i vertici vicini al "nuovo centro"
 					baricentri_ordinati.push_back(adiacenti[centro][j]);
 					baricentri_visitati.push_back(adiacenti[centro][j]);
 					centro = adiacenti[centro][j];
@@ -722,10 +735,18 @@ PolygonalMesh costruzione_duale(const PolygonalMesh& mesh, unsigned int num_facc
 			}
 		}
 		
+		//Aggiungo l'ID della faccia
 		duale.Cell2DsId.push_back(i);
+		
+		//Aggiungo i vertici della faccia, i baricentri ordinati
 		duale.Cell2DsVertices.push_back(baricentri_ordinati);
+		
+		//Aggiorno la dimensione dell'i-esima faccia
 		duale.Cell2DsNumVert.push_back(baricentri_ordinati.size());
 		
+		
+		//Una volta che ho costruito i vertici in modo ordinato, uso la funzione EsisteLato per ogni coppia di vertici consecutivi
+		//Questa funzione mi permette di salvare automaticamente i lati in modo ordinato 
 		vector<unsigned int> lati_duale;
 		for (unsigned int j = 0; j < baricentri_ordinati.size(); j++) {
 			unsigned int v0 = baricentri_ordinati[j];
