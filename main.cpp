@@ -10,11 +10,26 @@ using namespace PolygonalLibrary;
 
 int main(){
 	
+	//int argc, char *argv[]
+	
+	/*if(argc == 1)
+		cout << "primo: " << argv[0] << endl;
+	
+	//unsigned int p;
+	if(argc == 5)
+	{
+		cout << "cinque: " << argv[0]  << " " << argv[1]  << " " << argv[2]  << " " << argv[4]  << " "  << endl;
+		//istringstream convert(argv[1]);
+		//convert >> p;
+		//p = argv[1]
+	}*/
+	
+	
 	PolygonalMesh mesh;
 	PolygonalMesh duale;
 	
-	unsigned int p=4;
-	unsigned int q =3;
+	unsigned int p=3;
+	unsigned int q =5;
 	unsigned int b=3;
 	//unsigned int c=0;
 	
