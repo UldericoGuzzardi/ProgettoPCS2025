@@ -29,6 +29,6 @@ PolygonalMesh costruzione_duale(const PolygonalMesh& mesh, unsigned int num_facc
 
 void ProiezioneSfera(PolygonalMesh& mesh);
 
-void TrovaCamminoMinimo(PolygonalMesh& mesh, unsigned int id_vertice_1, unsigned int id_vertice_2, std::vector<int>& VertexShortPath, std::vector<int>& EdgeShortPath);
+void TrovaCamminoMinimo(PolygonalMesh& mesh, unsigned int id_vertice_1, unsigned int id_vertice_2, std::vector<int>& VertexShortPath, std::vector<int>& EdgeShortPath, unsigned int num_lati_iniziali);
 
 }

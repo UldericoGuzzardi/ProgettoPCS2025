@@ -446,7 +446,7 @@ void TriangolaFaccia(PolygonalMesh& mesh, Eigen::Vector3d v0, Eigen::Vector3d v1
 	//Adesso ho la suddivisione della faccia in strati, costruisco i lati andando strato per strato
 	
 	//Itero sul numero di strati
-	for (unsigned int j=0; j<strati_vertici.size(); j++){ 
+	/*for (unsigned int j=0; j<strati_vertici.size(); j++){ 
 	
 		//Itero sul numero di vertici dello strato j-esimo
 		for (unsigned int i=0; i<strati_vertici[j].size();i++){ 
@@ -471,7 +471,7 @@ void TriangolaFaccia(PolygonalMesh& mesh, Eigen::Vector3d v0, Eigen::Vector3d v1
 					
 				}
 		}
-	}
+	}*/
 	
 	
 	//Costruisco le facce
@@ -802,7 +802,7 @@ void ProiezioneSfera(PolygonalMesh& mesh){
 	
 using namespace std;
 //Costruiamo una funzione per trovare il cammino minimo tra due vertici nella mesh poliedrica
-void TrovaCamminoMin(PolygonalMesh& mesh, unsigned int id_vertice_1, unsigned int id_vertice_2, std::vector<int>& VertexShortPath, std::vector<int>& EdgeShortPath){
+void TrovaCamminoMin(PolygonalMesh& mesh, unsigned int id_vertice_1, unsigned int id_vertice_2, std::vector<int>& VertexShortPath, std::vector<int>& EdgeShortPath, unsigned int num_lati_iniziali){
 	//Calcolo delle lunghezze dei lati nella mesh
 	vector<double> EdgeLengths(mesh.NumCell1Ds);
 	for(unsigned int i = 0; i < mesh.NumCell1Ds; ++i){
@@ -815,7 +815,7 @@ void TrovaCamminoMin(PolygonalMesh& mesh, unsigned int id_vertice_1, unsigned in
 	//Costruzione della lista di adiacenza
 	using Edge = pair<unsigned int, double>; //coppia (vertice adiacente, peso)
 	vector<vector<Edge>> adj(mesh.NumCell0Ds); //lista di adiacenza per ogni vertice
-	for (unsigned int i = 0; i < mesh.NumCell1Ds; ++i){
+	for (unsigned int i = num_lati_iniziali; i < mesh.NumCell1Ds; ++i){
 		unsigned int u = mesh.Cell1DsExtrema(0, i);
 		unsigned int v = mesh.Cell1DsExtrema(1, i);
 		double len = EdgeLengths[i];
