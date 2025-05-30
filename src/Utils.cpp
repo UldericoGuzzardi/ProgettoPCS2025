@@ -5,6 +5,11 @@
 #include <cmath>
 #include <algorithm>
 #include <utility>
+#include <vector>
+#include <queue>
+#include <limits>
+#include "Eigen/Eigen"
+
 
 namespace PolygonalLibrary
 {
@@ -794,6 +799,95 @@ void ProiezioneSfera(PolygonalMesh& mesh){
 		
 	}
 	}
+	
+using namespace std;
+//Costruiamo una funzione per trovare il cammino minimo tra due vertici nella mesh poliedrica
+void TrovaCamminoMin(PolygonalMesh& mesh, unsigned int id_vertice_1, unsigned int id_vertice_2, std::vector<int>& VertexShortPath, std::vector<int>& EdgeShortPath){
+	//Calcolo delle lunghezze dei lati nella mesh
+	vector<double> EdgeLengths(mesh.NumCell1Ds);
+	for(unsigned int i = 0; i < mesh.NumCell1Ds; ++i){
+		unsigned int a = mesh.Cell1DsExtrema(0, i); //estremo iniziale del lato
+		unsigned int b = mesh.Cell1DsExtrema(1, i); //estremo finale
+		Eigen::Vector3d v1 = mesh.Cell0DsCoordinates.col(a); //coordinate del primo vertice 
+		Eigen::Vector3d v2 = mesh.Cell0DsCoordinates.col(b); //idem per il secondo vertice
+		EdgeLengths[i] = (v1 - v2).norm();
+	}
+	//Costruzione della lista di adiacenza
+	using Edge = pair<unsigned int, double>; //coppia (vertice adiacente, peso)
+	vector<vector<Edge>> adj(mesh.NumCell0Ds); //lista di adiacenza per ogni vertice
+	for (unsigned int i = 0; i < mesh.NumCell1Ds; ++i){
+		unsigned int u = mesh.Cell1DsExtrema(0, i);
+		unsigned int v = mesh.Cell1DsExtrema(1, i);
+		double len = EdgeLengths[i];
+		adj[u].emplace_back(v, len); // aggiunta dell'arco da u a v
+		adj[u].emplace_back(u, len); // aggiunta dell'arco da v a u
+	}
+	//Inizializzazione per l'algoritmo di Dijkstra
+	vector<double> dist(mesh.NumCell0Ds, numeric_limits<double>::infinity()); //distanze minime dai vertici
+	vector<int> pred(mesh.NumCell0Ds, -1); //predecessori nel cammino minimo
+	priority_queue<pair<double, unsigned int>, vector<pair<double, unsigned int>>, greater<>>  pq; //Coda di priorità (prima quelle minori)
+	
+	dist[id_vertice_1] = 0.0; //distanza dal vertice sorgente a se stesso è nulla
+	pred[id_vertice_1] = id_vertice_1; 
+	pq.emplace(0.0, id_vertice_1); //inserimento del vertice sorgente nella coda
+	
+	//Algoritmo di Dijkstra
+	while (!pq.empty()) {
+		auto [d, u] = pq.top(); pq.pop(); //estrazione del vertice con distanza minima
+		if (d > dist[u]) continue; //se la distanza è maggiore di quella già trovata, ignora gli elementi obsoleti
+		//non si aggiorna direttamente la priorità di w nella cosa ma si inserisce un nuovo elemento con distanza aggiornata perchè la struttura non permette aggiornamenti diretti
+		
+		//Esplorazione dei vicini del vertice corrente
+		for (auto [v, w] : adj[u]){
+			if (dist[u] + w < dist[v]){ //se si trova un cammino minore
+				dist[v] = dist[u] + w; //aggiorna la distanza
+				pred[v] = u; //aggiorna il predecessore
+				pq.emplace(dist[v], v); //inserisce il vertice nella coda con la nuova distanza
+			}
+		}
+	}
+	
+	//Ricostruzione del cammino minimo dal vertice destinazione al sorgente
+	vector<unsigned int> path;
+	for (int at = id_vertice_2; at != -1; at = pred[at])
+		path.push_back(at); //aggiunta del vertice al cammino
+	reverse(path.begin(), path.end()); //inverte il cammino per ottenere l'ordine corretto
+	
+	//Verifica l'esistenza del cammino tra i due vertici
+	if(path.front() != id_vertice_1){
+		cerr << "Nessun cammino trovato tra i vertici" << id_vertice_1 << "e" << id_vertice_2 << endl;
+		return;
+	}
+	//Inizializzazione dei vettori ShorthPath per i vertici e i lati
+	VertexShortPath.assign(mesh.NumCell0Ds, 0); //Tutti i vertici inizialmente non appartengono al cammino
+	EdgeShortPath.assign(mesh.NumCell1Ds, 0); //Tutti i lati inizialmente non appartengono al cammino
+	
+	//Etichettatura dei vertici appartenenti al cammino minimo 
+	for (auto id : path)
+		VertexShortPath[id] = 1;
+	//Etichettatura dei lati appartenenti al cammino minimo e calcolo della lunghezza totale
+	double total_length = 0.0;
+	for (size_t i = 0; i < path.size() - 1; ++i){
+		unsigned int u = path[i];
+		unsigned int v = path[i+1];
+		
+		//Ricerca del lato che collega i due vertici consecutivi nel cammino
+		for (unsigned int j = 0; j < mesh.NumCell1Ds; ++j){
+			unsigned int a = mesh.Cell1DsExtrema(0, j);
+			unsigned int b = mesh.Cell1DsExtrema(1, j);
+			if ((a == u && b == v ) || (a == v && b == u)){
+				EdgeShortPath[j] = 1; //Etichetta il lato come parte del cammino minimo
+				total_length += EdgeLengths[j]; //Aggiunge la lunghezza del lato al totale
+				break; //esce dal ciclo quando viene trovato il lato
+			}
+		}
+	}
+	
+	//Output del numero di lati e della lunghezza totale del cammino minimo
+	cout << "Numero di lati nel cammino minimo:" << path.size() - 1 << endl;
+	cout << "Lunghezza totale del cammino: " << total_length << endl;
+}
+
 	
 	
 }
