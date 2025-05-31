@@ -19,7 +19,7 @@ unsigned int EsisteLato(PolygonalMesh& mesh, const Eigen::Vector2i new_lato);
 
 void TriangolaFaccia(PolygonalMesh& mesh, Eigen::Vector3d v0, Eigen::Vector3d v1, Eigen::Vector3d v2, unsigned int b);
 
-void TriangolazionePoliedro(PolygonalMesh& mesh, unsigned int b);
+void TriangolazionePoliedro(PolygonalMesh& mesh, unsigned int b,unsigned int c);
 
 Eigen::Vector3d calcolo_baricentro(const PolygonalMesh& mesh, vector<unsigned int> verts);
 
@@ -31,4 +31,7 @@ void ProiezioneSfera(PolygonalMesh& mesh);
 
 void TrovaCamminoMinimo(PolygonalMesh& mesh, unsigned int id_vertice_1, unsigned int id_vertice_2, std::vector<int>& VertexShortPath, std::vector<int>& EdgeShortPath, unsigned int num_lati_iniziali);
 
+void AggiungiFaccia(PolygonalMesh& mesh, vector<unsigned int> faccia);
+
+void TriangolaFaccia_2(PolygonalMesh& mesh, Eigen::Vector3d v0, Eigen::Vector3d v1, Eigen::Vector3d v2, unsigned int b, unsigned int num_facce_iniziali);
 }
