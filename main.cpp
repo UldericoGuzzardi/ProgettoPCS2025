@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 #include "Polygons.hpp"
 #include "Utils.hpp"
 #include "UCDUtilities.hpp"
@@ -72,6 +73,7 @@ int main(){
 			
 		}
 		ProiezioneSfera(mesh);
+		
 		Gedim::UCDUtilities utilities;
 		{ 
 		utilities.ExportPoints("./Cell0Ds.inp",
@@ -101,7 +103,7 @@ int main(){
 			}
 			
 			if (!check_ed_vert(mesh)){
-			cerr<<"Errore nel controllo di lati e vertici del poliedro"<<endl;
+			cerr <<"Errore nel controllo di lati e vertici del poliedro"<<endl;
 			}
 			
 			if (b==1){
@@ -119,6 +121,7 @@ int main(){
 			if (!check_ed_vert(duale)){
 				cerr<<"Errore nel controllo di lati e vertici del poliedro"<<endl;
 			}
+			
 			Gedim::UCDUtilities utilities;
 			{ 
 			utilities.ExportPoints("./Cell0Ds.inp",
@@ -133,13 +136,6 @@ int main(){
 		}
 	}
 	
-	
-	
-	
-	
-	
-	
-	
 	    Gedim::UCDUtilities utilities;
 		{ 
 		utilities.ExportPoints("./Cell0Ds.inp",
@@ -152,7 +148,25 @@ int main(){
                                  {});
 		}
 	
-	//DA AGGIUNGERE: chiamata alla funzione TrovaCamminoMinimo
+	//Input da tastiera per calcolo del cammino minimo
+	unsigned int id_v1, id_v2;
+	cout << "Inserisci due ID di vertici tra cui calcolare il camminimo minimo:";
+	cin >> id_v1 >> id_v2;
+	
+	//Controllo validità vertici inseriti
+	if (id_v1 >= mesh.NumCell0Ds || id_v2 >= mesh.NumCell0Ds){
+		std::cerr << "Errore: identificstivi dei vertici non validi. \n";
+		return 1;
+	}
+	//Vettori per cammino minimo
+	std::vector<int> VertexShortPath(mesh.NumCell0Ds, 0);
+	std::vector<int> EdgeShortPath(mesh.NumCell1Ds, 0);
+	
+	//Calcolo del cammino minimo
+	TrovaCamminoMinimo(mesh, id_v1, id_v2, VertexShortPath, EdgeShortPath, num_lati_iniziali);
+	
+	//Esportazione dei dati per Paraview
+	ExportCamminoMinimoPerParaview(mesh, VertexShortPath, EdgeShortPath, "cammino_minimo.inp");
 	
 	return 0;
 }
