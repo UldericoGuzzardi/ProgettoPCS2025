@@ -1267,54 +1267,55 @@ void TriangolaFaccia_2(PolygonalMesh& mesh, Eigen::Vector3d v0, Eigen::Vector3d 
 		}
 
 }
-void ExportCamminoMinimoPerParaview(const PolygonalMesh& mesh, const std::vector<int>& VertexShortPath, const std::vector<int>& EdgeShortPath, const std::string& fileName){
-	using namespace Gedim;
-    
-	if (VertexShortPath.empty() && EdgeShortPath.empty()){
-		std:: cout << "Nessun cammino minimo da esportare" << std::endl;
-		return;
-	}
-	//Costruzione matrice punti (Nx3)
-	Eigen::MatrixXd points(mesh.Cell0Ds.size(), 3);
-	for (std::size_t i = 0; i < mesh.Cell0Ds.size(); ++i){
-		points(i, 0) = mesh.Cell0Ds[i].Coordinate[0];
-		points(i, 1) = mesh.Cell0Ds[i].Coordinate[1];
-		points(i, 2) = 0.0; //2D
-	}
-	//Costruzione matrice segmenti (Mx2)
-	Eigen::MatrixXi segments(mesh.Cell1Ds.size(), 2);
-	for (std::size_t i = 0; i < mesh.Cell1Ds.size(); ++i){
-		segments(i, 0) = mesh.Cell1Ds[i].IdVertices[0];
-		segments(i, 1) = mesh.Cell1Ds[i].IdVertices[1];
-	}
-	// Proprietà per i vertici del cammino minimo
-    Gedim::UCDProperty<double> vertexProp;
-    vertexProp.Name = "VertexShortPath";
-    vertexProp.Data = std::vector<double>(mesh.Cell0Ds.size(), 0.0);
-    for (int i : VertexShortPath) {
-        if (i >= 0 && static_cast<std::size_t>(i) < vertexProp.Data.size())
-            vertexProp.Data[i] = 1.0;
-    }
+void ExportCamminoMinimoPerParaview(const PolygonalMesh& mesh,
+                                                       const std::vector<int>& VertexShortPath,
+                                                       const std::vector<int>& EdgeShortPath,
+                                                       const std::string& fileName)
+{
+    using namespace Gedim;
 
-    // Proprietà per i segmenti del cammino minimo
-    Gedim::UCDProperty<double> edgeProp;
-    edgeProp.Name = "EdgeShortPath";
-    edgeProp.Data = std::vector<double>(mesh.Cell1Ds.size(), 0.0);
-    for (int i : EdgeShortPath) {
-        if (i >= 0 && static_cast<std::size_t>(i) < edgeProp.Data.size())
-            edgeProp.Data[i] = 1.0;
-    }
+    UCDUtilities utilities;
 
-    // Vettore materiali vuoto (dimensione = numero segmenti)
-    Eigen::VectorXi materials(mesh.Cell1Ds.size());
-	materials.setZero();
+    // Proprietà per vertici
+    std::vector<double> vertex_data(mesh.NumCell0Ds);
+    for (unsigned int i = 0; i < mesh.NumCell0Ds; ++i)
+        vertex_data[i] = static_cast<double>(VertexShortPath[i]);
 
-	//Creazione di un oggetto export e chiamata dell'export
-	UCDUtilities exporter;
-	exporter.ExportSegments(fileName, mesh.Cell0DsCoordinates, mesh.Cell1DsExtrema, pointProps, segmentProps, materials);
+    UCDProperty<double> ShortPathVertici;
+    ShortPathVertici.Label = "ShortPath";
+    ShortPathVertici.UnitLabel = "";
+    ShortPathVertici.NumComponents = 1;
+    ShortPathVertici.Data = vertex_data.data();
+
+    std::vector<UCDProperty<double>> ProprietàVertici = { ShortPathVertici };
+
+    // Proprietà per lati
+    std::vector<double> edge_data(mesh.NumCell1Ds);
+    for (unsigned int i = 0; i < mesh.NumCell1Ds; ++i)
+        edge_data[i] = static_cast<double>(EdgeShortPath[i]);
+
+    UCDProperty<double> ShortPathLati;
+    ShortPathLati.Label = "ShortPath";
+    ShortPathLati.UnitLabel = "";
+    ShortPathLati.NumComponents = 1;
+    ShortPathLati.Data = edge_data.data();
+
+    std::vector<UCDProperty<double>> ProprietàLati = { ShortPathLati };
+
+    // Materiali (default 0)
+    Eigen::VectorXi materiali_lati = Eigen::VectorXi::Zero(mesh.NumCell1Ds);
 	
-	std::cout << "File" << fileName << "esportato correttamente." << std::endl;
+	std::cout << "Exporting to file:" << fileName << std::endl;
 
+
+    // Esportazione
+    utilities.ExportSegments(fileName,
+                             mesh.Cell0DsCoordinates,
+                             mesh.Cell1DsExtrema,
+                             ProprietàVertici,
+                             ProprietàLati,
+                             materiali_lati);
 }
+
 
 }

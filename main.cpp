@@ -10,7 +10,7 @@ using namespace PolygonalLibrary;
 
 
 int main(){
-	
+	std::cout << "Partito\n";
 	//int argc, char *argv[]
 	
 	/*if(argc == 1)
@@ -166,7 +166,13 @@ int main(){
 	TrovaCamminoMinimo(mesh, id_v1, id_v2, VertexShortPath, EdgeShortPath, num_lati_iniziali);
 	
 	//Esportazione dei dati per Paraview
-	ExportCamminoMinimoPerParaview(mesh, VertexShortPath, EdgeShortPath, "cammino_minimo.inp");
+	try{
+		std::cout << "Prima di export\n";
+		ExportCamminoMinimoPerParaview(mesh, VertexShortPath, EdgeShortPath, "cammino_minimo.inp");
+		std::cout << "Export completato.\n";
+	} catch (const std::exception& e){
+		std::cerr << "Errore durante export:" << e.what() << "\n";
+	}
 	
 	return 0;
 }
