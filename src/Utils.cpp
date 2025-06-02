@@ -1270,26 +1270,27 @@ void TriangolaFaccia_2(PolygonalMesh& mesh, Eigen::Vector3d v0, Eigen::Vector3d 
 void ExportCamminoMinimoPerParaview(const PolygonalMesh& mesh,
                                                        const std::vector<int>& VertexShortPath,
                                                        const std::vector<int>& EdgeShortPath,
-                                                       const std::string& fileName)
+                                                       const std::string& "cammino_minimo.inp")
 {
     using namespace Gedim;
 
     UCDUtilities utilities;
 
-    // Proprietà per vertici
+    // Proprietà per vertici, viene creato un vettore con tanti elementi quanti i vertici nella mesh
     std::vector<double> vertex_data(mesh.NumCell0Ds);
     for (unsigned int i = 0; i < mesh.NumCell0Ds; ++i)
-        vertex_data[i] = static_cast<double>(VertexShortPath[i]);
+        vertex_data[i] = static_cast<double>(VertexShortPath[i]); //Converte i valori interi in double (richiesto in UCDProperty), ogni valore indica se il vertice fa parte o meno del cammino
 
+	//Creazione di un oggetto che rappresenta la proprietà associata ai vertici (cammino minimo)
     UCDProperty<double> ShortPathVertici;
-    ShortPathVertici.Label = "ShortPath";
-    ShortPathVertici.UnitLabel = "";
-    ShortPathVertici.NumComponents = 1;
-    ShortPathVertici.Data = vertex_data.data();
-
+    ShortPathVertici.Label = "ShortPath"; //Nome della proprietà visualizzata in Paraview
+    ShortPathVertici.UnitLabel = ""; //Nessuna unità di misura
+    ShortPathVertici.NumComponents = 1; //Proprietà scalare
+    ShortPathVertici.Data = vertex_data.data(); //Puntatore ai dati
+	//Viene inserità la proprietà in un vettore perché l'interfaccia accetta una lista
     std::vector<UCDProperty<double>> ProprietàVertici = { ShortPathVertici };
 
-    // Proprietà per lati
+    // Proprietà per lati con stesse definizioni delle caratteristiche definite per i vertici
     std::vector<double> edge_data(mesh.NumCell1Ds);
     for (unsigned int i = 0; i < mesh.NumCell1Ds; ++i)
         edge_data[i] = static_cast<double>(EdgeShortPath[i]);
@@ -1302,14 +1303,14 @@ void ExportCamminoMinimoPerParaview(const PolygonalMesh& mesh,
 
     std::vector<UCDProperty<double>> ProprietàLati = { ShortPathLati };
 
-    // Materiali (default 0)
+    // Materiali (default 0), servono solo per compatibilità con la scrittura del file .inp, ma qui non hanno un significato
     Eigen::VectorXi materiali_lati = Eigen::VectorXi::Zero(mesh.NumCell1Ds);
-	
-	std::cout << "Exporting to file:" << fileName << std::endl;
+	//Stampa di Debug
+	std::cout << "Exporting to file:" << "cammino_minimo.inp" << std::endl;
 
 
-    // Esportazione
-    utilities.ExportSegments(fileName,
+    // Esportazione(scrittura del file usando le informazioni raccolte)
+    utilities.ExportSegments("cammino_minimo.inp",
                              mesh.Cell0DsCoordinates,
                              mesh.Cell1DsExtrema,
                              ProprietàVertici,
