@@ -11,7 +11,11 @@ list(APPEND src_headers ${CMAKE_CURRENT_SOURCE_DIR}/Polygons.hpp)
 list(APPEND src_headers ${CMAKE_CURRENT_SOURCE_DIR}/Utils.hpp)
 
 
+
 list(APPEND src_sources ${CMAKE_CURRENT_SOURCE_DIR}/Utils.cpp)
+list(APPEND src_sources ${CMAKE_CURRENT_SOURCE_DIR}/SecondaTriang.cpp)
+list(APPEND src_sources ${CMAKE_CURRENT_SOURCE_DIR}/Duale.cpp)
+list(APPEND src_sources ${CMAKE_CURRENT_SOURCE_DIR}/CamminoMinimo.cpp)
 
 list(APPEND src_includes ${CMAKE_CURRENT_SOURCE_DIR})
 

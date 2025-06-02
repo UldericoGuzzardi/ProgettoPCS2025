@@ -31,7 +31,7 @@ int main(){
 	
 	unsigned int p=3;
 	unsigned int q =3;
-	unsigned int b=0;
+	unsigned int b=2;
 	unsigned int c=2;
 	
 	unsigned int num_facce_iniziali;
@@ -86,6 +86,34 @@ int main(){
                                  {});
 		}
 		
+		//Input da tastiera per calcolo del cammino minimo
+		unsigned int id_v1= 1;
+		unsigned int id_v2=8;
+		
+		//Controllo validità vertici inseriti
+		if (id_v1 >= mesh.NumCell0Ds || id_v2 >= mesh.NumCell0Ds){
+			std::cerr << "Errore: identificativi dei vertici non validi. \n";
+			return 1;
+		}
+		//Vettori per cammino minimo
+		std::vector<int> VertexShortPath(mesh.NumCell0Ds, 0);
+		std::vector<int> EdgeShortPath(mesh.NumCell1Ds, 0);
+		
+		//Calcolo del cammino minimo
+		TrovaCamminoMinimo(mesh, id_v1, id_v2, VertexShortPath, EdgeShortPath, num_lati_iniziali);
+		
+		//Esportazione dei dati per Paraview
+		try{
+			std::cout << "Prima di export\n";
+			ExportCamminoMinimoPerParaview(mesh, VertexShortPath, EdgeShortPath, "cammino_minimo.inp");
+			std::cout << "Export completato.\n";
+		} catch (const std::exception& e){
+			std::cerr << "Errore durante export:" << e.what() << "\n";
+		}
+		
+		
+		
+		
 		return 0;
 		
 		
@@ -137,31 +165,7 @@ int main(){
 	}
 	
 	
-	//Input da tastiera per calcolo del cammino minimo
-	unsigned int id_v1, id_v2;
-	cout << "Inserisci due ID di vertici tra cui calcolare il camminimo minimo:";
-	cin >> id_v1 >> id_v2;
 	
-	//Controllo validità vertici inseriti
-	if (id_v1 >= mesh.NumCell0Ds || id_v2 >= mesh.NumCell0Ds){
-		std::cerr << "Errore: identificstivi dei vertici non validi. \n";
-		return 1;
-	}
-	//Vettori per cammino minimo
-	std::vector<int> VertexShortPath(mesh.NumCell0Ds, 0);
-	std::vector<int> EdgeShortPath(mesh.NumCell1Ds, 0);
-	
-	//Calcolo del cammino minimo
-	TrovaCamminoMinimo(mesh, id_v1, id_v2, VertexShortPath, EdgeShortPath, num_lati_iniziali);
-	
-	//Esportazione dei dati per Paraview
-	try{
-		std::cout << "Prima di export\n";
-		ExportCamminoMinimoPerParaview(mesh, VertexShortPath, EdgeShortPath, "cammino_minimo.inp");
-		std::cout << "Export completato.\n";
-	} catch (const std::exception& e){
-		std::cerr << "Errore durante export:" << e.what() << "\n";
-	}
 	
 	return 0;
 }
