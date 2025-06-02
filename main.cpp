@@ -136,17 +136,6 @@ int main(){
 		}
 	}
 	
-	    Gedim::UCDUtilities utilities;
-		{ 
-		utilities.ExportPoints("./Cell0Ds.inp",
-                               duale.Cell0DsCoordinates);
-		}
-		{
-		utilities.ExportSegments("./Cell1Ds.inp",
-                                 duale.Cell0DsCoordinates,
-                                 duale.Cell1DsExtrema,
-                                 {});
-		}
 	
 	//Input da tastiera per calcolo del cammino minimo
 	unsigned int id_v1, id_v2;
