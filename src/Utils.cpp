@@ -582,7 +582,68 @@ void ProiezioneSfera(PolygonalMesh& mesh){
 		mesh.Cell0DsCoordinates(2,i)= mesh.Cell0DsCoordinates(2,i)/norma;
 		
 	}
-	}
+}
+
+//Esportazione su ParaView
+void Esportazione_ParaView(PolygonalMesh& mesh, bool cammino){
 	
+	if(!cammino){
+		
+		Gedim::UCDUtilities utilities;
+		{ 
+		utilities.ExportPoints("./Cell0Ds.inp",
+                               mesh.Cell0DsCoordinates);
+		}
+		{
+		utilities.ExportSegments("./Cell1Ds.inp",
+                                 mesh.Cell0DsCoordinates,
+                                 mesh.Cell1DsExtrema,
+                                 {});
+		}
+	}else{
+		
+			
+		Gedim::UCDUtilities utilities;
+		{
+		vector<Gedim::UCDProperty<double>> cell0Ds_properties(1);
+
+		cell0Ds_properties[0].Label = "ShortPathVertici";
+		cell0Ds_properties[0].UnitLabel = "-";
+		cell0Ds_properties[0].NumComponents = 1;
+
+		vector<double> ShortPath_v(mesh.NumCell0Ds, 0.0);
+		for (unsigned int i = 0; i < mesh.NumCell0Ds; ++i) {
+			ShortPath_v[i] = static_cast<double>(mesh.Cell0DsShortPath[i]);
+		}
+
+		cell0Ds_properties[0].Data = ShortPath_v.data();
+
+		utilities.ExportPoints("./Cell0Ds.inp",
+							   mesh.Cell0DsCoordinates,
+							   cell0Ds_properties);
+		}
+			
+		{
+		vector<Gedim::UCDProperty<double>> cell1Ds_properties(1);
+
+		cell1Ds_properties[0].Label = "ShortPathLati";
+		cell1Ds_properties[0].UnitLabel = "-";
+		cell1Ds_properties[0].NumComponents = 1;
+
+		vector<double> ShortPath_e(mesh.NumCell1Ds, 0.0);
+		for (unsigned int i = 0; i < mesh.NumCell1Ds; ++i) {
+			ShortPath_e[i] = static_cast<double>(mesh.Cell1DsShortPath[i]);
+		}
+
+		cell1Ds_properties[0].Data = ShortPath_e.data();
+
+		utilities.ExportSegments("./Cell1Ds.inp",
+								mesh.Cell0DsCoordinates,
+								mesh.Cell1DsExtrema,
+								{}, 
+								cell1Ds_properties);
+		}
+	}
+}
 
 }

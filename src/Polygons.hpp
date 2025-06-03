@@ -15,12 +15,14 @@ struct PolygonalMesh
     unsigned int NumCell0Ds = 0; ///< number of Cell0D
     std::vector<unsigned int> Cell0DsId = {}; ///< Cell0D id, size 1 x NumberCell0D
     Eigen::MatrixXd Cell0DsCoordinates = {}; ///< Cell0D coordinates
-    
+	std::vector<unsigned int> Cell0DsShortPath = {}; ///< 1 se il vertice appartiene al cammino minimo, altrimenti 0
+   
+	
 	//Cell1D
     unsigned int NumCell1Ds = 0; ///< number of Cell1D
     std::vector<unsigned int> Cell1DsId = {}; ///< Cell1D id, size 1 x NumberCell1D
     Eigen::MatrixXi Cell1DsExtrema = {}; ///< Cell1D vertices indices, size 2 x NumberCell1D (fromId,toId)
-    
+    std::vector<unsigned int> Cell1DsShortPath = {}; ///< 1 se l'arco (cella 1D) appartiene al cammino minimo, altrimenti 0
 
 	//Cell2D
     unsigned int NumCell2Ds = 0; ///< number of Cell2D

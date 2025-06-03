@@ -9,30 +9,39 @@ using namespace Eigen;
 using namespace PolygonalLibrary;
 
 
-int main(){
-	std::cout << "Partito\n";
-	//int argc, char *argv[]
+int main(int argc, char *argv[]){
+	int p;
+	int q;
+	int b;
+	int c;
+	int id_vertice_1;
+	int id_vertice_2;
+	bool cammino;
 	
-	/*if(argc == 1)
-		cout << "primo: " << argv[0] << endl;
-	
-	//unsigned int p;
-	if(argc == 5)
-	{
-		cout << "cinque: " << argv[0]  << " " << argv[1]  << " " << argv[2]  << " " << argv[4]  << " "  << endl;
-		//istringstream convert(argv[1]);
-		//convert >> p;
-		//p = argv[1]
-	}*/
+	if (argc==5){
+		p = atoi(argv[1]);
+		q = atoi(argv[2]);
+		b = atoi(argv[3]);
+		c = atoi(argv[4]);
+		cammino= false;
+		
+	} else if(argc==7){
+		p = atoi(argv[1]);
+		q = atoi(argv[2]);
+		b = atoi(argv[3]);
+		c = atoi(argv[4]);
+		id_vertice_1 = atoi(argv[5]);
+		id_vertice_2 = atoi(argv[6]);
+		cammino= true;
+		
+	} else{
+		cerr<< "Errore: devi inserire 4 o 6 numeri"<<endl;
+		return 1;
+	}
 	
 	
 	PolygonalMesh mesh;
 	PolygonalMesh duale;
-	
-	unsigned int p=3;
-	unsigned int q =3;
-	unsigned int b=2;
-	unsigned int c=2;
 	
 	unsigned int num_facce_iniziali;
 	unsigned int num_lati_iniziali;
@@ -46,8 +55,9 @@ int main(){
 		return 1;
 	}
 	
-	
-	if (p==3){
+	if (p<3 || q<3){
+		cerr<<"Errore: Valori di p e q non validi"<<endl;
+	}else if (p==3){
 		bool pol = costruzione_poliedro(q, mesh);
 	
 		if (!pol){
@@ -74,47 +84,15 @@ int main(){
 		}
 		ProiezioneSfera(mesh);
 		
-		Gedim::UCDUtilities utilities;
-		{ 
-		utilities.ExportPoints("./Cell0Ds.inp",
-                               mesh.Cell0DsCoordinates);
-		}
-		{
-		utilities.ExportSegments("./Cell1Ds.inp",
-                                 mesh.Cell0DsCoordinates,
-                                 mesh.Cell1DsExtrema,
-                                 {});
-		}
-		
-		//Input da tastiera per calcolo del cammino minimo
-		unsigned int id_v1= 1;
-		unsigned int id_v2=8;
-		
-		//Controllo validità vertici inseriti
-		if (id_v1 >= mesh.NumCell0Ds || id_v2 >= mesh.NumCell0Ds){
-			std::cerr << "Errore: identificativi dei vertici non validi. \n";
-			return 1;
-		}
-		//Vettori per cammino minimo
-		std::vector<int> VertexShortPath(mesh.NumCell0Ds, 0);
-		std::vector<int> EdgeShortPath(mesh.NumCell1Ds, 0);
-		
+		if (cammino){
 		//Calcolo del cammino minimo
-		TrovaCamminoMinimo(mesh, id_v1, id_v2, VertexShortPath, EdgeShortPath, num_lati_iniziali);
-		
-		//Esportazione dei dati per Paraview
-		try{
-			std::cout << "Prima di export\n";
-			ExportCamminoMinimoPerParaview(mesh, VertexShortPath, EdgeShortPath, "cammino_minimo.inp");
-			std::cout << "Export completato.\n";
-		} catch (const std::exception& e){
-			std::cerr << "Errore durante export:" << e.what() << "\n";
+		TrovaCamminoMinimo(mesh, id_vertice_1, id_vertice_2, num_lati_iniziali);
 		}
 		
-		
-		
-		
+		Esportazione_ParaView(mesh, cammino);
 		return 0;
+		
+		
 		
 		
 	} else {
@@ -144,23 +122,18 @@ int main(){
 			
 			}
 			duale = costruzione_duale(mesh, num_facce_iniziali, num_lati_iniziali);
+			
 			ProiezioneSfera(duale);
 			
 			if (!check_ed_vert(duale)){
 				cerr<<"Errore nel controllo di lati e vertici del poliedro"<<endl;
 			}
+			if (cammino){
+			//Calcolo del cammino minimo
+			TrovaCamminoMinimo(mesh, id_vertice_1, id_vertice_2, num_lati_iniziali);
+			}
 			
-			Gedim::UCDUtilities utilities;
-			{ 
-			utilities.ExportPoints("./Cell0Ds.inp",
-								   duale.Cell0DsCoordinates);
-			}
-			{
-			utilities.ExportSegments("./Cell1Ds.inp",
-									 duale.Cell0DsCoordinates,
-									 duale.Cell1DsExtrema,
-									 {});
-			}
+			Esportazione_ParaView(duale, cammino);		
 		}
 	}
 	

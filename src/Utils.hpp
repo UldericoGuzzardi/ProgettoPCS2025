@@ -30,11 +30,12 @@ PolygonalMesh costruzione_duale(const PolygonalMesh& mesh, unsigned int num_facc
 
 void ProiezioneSfera(PolygonalMesh& mesh);
 
-void TrovaCamminoMinimo(PolygonalMesh& mesh, unsigned int id_vertice_1, unsigned int id_vertice_2, std::vector<int>& VertexShortPath, std::vector<int>& EdgeShortPath, unsigned int num_lati_iniziali);
-
-void ExportCamminoMinimoPerParaview(const PolygonalMesh& mesh, const std::vector<int>& VertexShortPath, const std::vector<int>& EdgeShortPath, const std::string& fileName);
+void TrovaCamminoMinimo(PolygonalMesh& mesh, unsigned int id_vertice_1, unsigned int id_vertice_2, unsigned int num_lati_iniziali);
 
 void AggiungiFaccia(PolygonalMesh& mesh, vector<unsigned int> faccia);
 
 void TriangolaFaccia_2(PolygonalMesh& mesh, Eigen::Vector3d v0, Eigen::Vector3d v1, Eigen::Vector3d v2, unsigned int b, unsigned int num_facce_iniziali);
+
+void Esportazione_ParaView(PolygonalMesh& mesh, bool cammino);
+
 }
