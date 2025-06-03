@@ -57,7 +57,9 @@ int main(int argc, char *argv[]){
 	
 	if (p<3 || q<3){
 		cerr<<"Errore: Valori di p e q non validi"<<endl;
+		
 	}else if (p==3){
+		
 		bool pol = costruzione_poliedro(q, mesh);
 	
 		if (!pol){
@@ -85,8 +87,11 @@ int main(int argc, char *argv[]){
 		ProiezioneSfera(mesh);
 		
 		if (cammino){
-		//Calcolo del cammino minimo
-		TrovaCamminoMinimo(mesh, id_vertice_1, id_vertice_2, num_lati_iniziali);
+			//Calcolo del cammino minimo
+			 if (!TrovaCamminoMinimo(mesh, id_vertice_1, id_vertice_2, num_lati_iniziali)){
+				 
+				 return 1;
+			}
 		}
 		
 		Esportazione_ParaView(mesh, cammino);
@@ -129,11 +134,16 @@ int main(int argc, char *argv[]){
 				cerr<<"Errore nel controllo di lati e vertici del poliedro"<<endl;
 			}
 			if (cammino){
-			//Calcolo del cammino minimo
-			TrovaCamminoMinimo(mesh, id_vertice_1, id_vertice_2, num_lati_iniziali);
+				
+				//Calcolo del cammino minimo
+				if (!TrovaCamminoMinimo(duale, id_vertice_1, id_vertice_2, 0)){
+					
+					 return 1;
+				}
 			}
 			
-			Esportazione_ParaView(duale, cammino);		
+			Esportazione_ParaView(duale, cammino);
+
 		}
 	}
 	

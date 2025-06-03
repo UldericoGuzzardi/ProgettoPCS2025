@@ -528,6 +528,7 @@ void TriangolaFaccia(PolygonalMesh& mesh, Eigen::Vector3d v0, Eigen::Vector3d v1
 //Applico e chiamo la funzione definita in precedenza
 void TriangolazionePoliedro(PolygonalMesh& mesh, unsigned int b, unsigned int c){
 	unsigned int num_facce=mesh.NumCell2Ds;
+	
 	for (unsigned int i=0; i<num_facce; i++){ //per ogni faccia, salvo i vertici, i lati e le nuove facce della triangolazione
 		
 		//cout<<"Faccia"<< i<<":"<<endl;

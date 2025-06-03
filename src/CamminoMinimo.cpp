@@ -18,11 +18,11 @@ namespace PolygonalLibrary
 {
 
 
-void TrovaCamminoMinimo(PolygonalMesh& mesh, unsigned int id_vertice_1, unsigned int id_vertice_2, unsigned int num_lati_iniziali) {
+bool TrovaCamminoMinimo(PolygonalMesh& mesh, unsigned int id_vertice_1, unsigned int id_vertice_2, unsigned int num_lati_iniziali) {
 	
     if (id_vertice_1 >= mesh.NumCell0Ds || id_vertice_2 >= mesh.NumCell0Ds) {
         cerr << "ID dei vertici non valido." << endl;
-        return;
+        return false;
     }
 
     unsigned int N = mesh.NumCell0Ds;
@@ -85,7 +85,7 @@ void TrovaCamminoMinimo(PolygonalMesh& mesh, unsigned int id_vertice_1, unsigned
     // Ricostruisco il cammino (controllo se esiste)
     if (pred[id_vertice_2] == -1) {
         cerr << "Nessun cammino trovato da " << id_vertice_1 << " a " << id_vertice_2 << endl;
-        return;
+        return false;
     }
 
 
@@ -137,6 +137,8 @@ void TrovaCamminoMinimo(PolygonalMesh& mesh, unsigned int id_vertice_1, unsigned
 
     cout << "Numero di archi nel cammino: " << Lunghezza_cammino << endl;
     cout << "Lunghezza totale: " << Lunghezza_tot << endl;
+	
+	return true;
 }
 
 }
