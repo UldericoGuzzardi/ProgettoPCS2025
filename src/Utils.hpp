@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <vector>
+#include "Eigen/Eigen"
 #include <string>
 #include "Polygons.hpp"
 
@@ -11,6 +12,8 @@ namespace PolygonalLibrary
 {
 
 bool costruzione_poliedro(int q, PolygonalMesh& mesh);
+
+bool genera_poliedro(int p, int q, int b);
 
 bool check_ed_vert(const PolygonalMesh& mesh);
 

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include "Polygons.hpp"
 #include "Utils.hpp"
@@ -17,6 +18,13 @@ int main(int argc, char *argv[]){
 	int id_vertice_1;
 	int id_vertice_2;
 	bool cammino;
+	
+	if (!genera_poliedro(p, q, b)){
+		std::cerr << "Errore nella generazione del poliedro.\n";
+		return 1;
+	}
+	
+	std::cout << "Poliedro generato correttamente.\n";
 	
 	if (argc==5){
 		p = atoi(argv[1]);

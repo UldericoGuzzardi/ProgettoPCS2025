@@ -304,6 +304,111 @@ bool costruzione_poliedro(int q, PolygonalMesh& mesh){
 	return true;
 }
 
+bool genera_poliedro(int p, int q, int b){
+	if (p != 3){
+		std::cerr << "Errore: p diverso da 3 non supportato.\n";
+		return false;
+	}
+	
+	PolygonalMesh mesh;
+	if (!costruzione_poliedro(q, mesh)){
+		std::cerr << "Errore: costruzione del poliedro fallita.\n";
+		return false;
+	}
+	//Scrittura Cell0Ds.txt: elenco degli ID e delle coordinate dei vertici
+	std::ofstream file0("Cell0Ds.txt");
+	if (!file0){
+		std::cerr << "Errore apertura file Cell0Ds.txt\n";
+		return false;
+	}
+	file0 << "# ID \t x \t y \t z\n";
+	for (std::size_t i = 0; i < mesh.NumCell0Ds; ++i){
+		file0 << mesh.Cell0DsId[i] << "\t"
+			  << mesh.Cell0DsCoordinates(0, i) << "\t"
+			  << mesh.Cell0DsCoordinates(1, i) << "\t"
+			  << mesh.Cell0DsCoordinates(2, i) << "\n";
+	}
+	file0.close();
+	
+	//Scrittura Cell1Ds.txt: elenco degli ID e dei due vertici estremi di ogni lato
+	std::ofstream file1("Cell1Ds.txt");
+	if (!file1){
+		std::cerr << "Errore apertura file Cell1Ds.txt\n";
+		return false;
+	}
+	file1 << "# ID \t vertice1 \t vertice2\n";
+	for(std::size_t i = 0; i < mesh.NumCell1Ds; ++i){
+		file1 << mesh.Cell1DsId[i] << "\t"
+			  << mesh.Cell1DsExtrema(0, i) << "\t"
+			  << mesh.Cell1DsExtrema(1, i) << "\n";
+	}
+	file1.close();
+	
+	//Scrittura Cell2Ds.txt: elenco delle facce con numero di vertici, vertici stessi, numero di lati e lati stessi
+	std::ofstream file2("Cell2Ds.txt");
+	if (!file2){
+		std::cerr << "Errore apertura file Cell2Ds.txt\n";
+		return false;
+	}
+	file2 << "# ID \t NumVertici \t NumLati \t Lati\n";
+	for(std::size_t i = 0; i < mesh.NumCell2Ds; ++i){
+		file2 << mesh.Cell2DsId[i] << "\t"
+			  << mesh.Cell2DsNumVert[i] << "\t";
+		// Elenco vertici faccia
+		for (auto v : mesh.Cell2DsVertices[i]){
+			file2 << v << " ";
+		}
+		file2 << "\t" << mesh.Cell2DsNumEdg[i] << "\t";
+		// Elenco lati faccia
+		for (auto e : mesh.Cell2DsEdges[i]){
+			file2 << e << " ";
+		}
+		file2 << "\n";
+	}
+	file2.close();
+	
+	// Scrittura Cell3Ds.txt: informazioni globali del poliedro , ossia numero di vertici, lati e facce, e le loro liste
+	std::ofstream file3("Cell3Ds.txt");
+	if (!file3){
+		std::cerr << "Errore apertura file Cell3Ds.txt\n";
+		return false;
+	}
+	file3 << "# ID \t NumVertici \t NumLati \t NumFacce \t Vertici \t Lati \t Facce\n";
+	file3 << mesh.Cell3DsId << "\t"
+		  << mesh.Cell3DsNumVert << "\t"
+		  << mesh.Cell3DsNumEdg << "\t"
+		  << mesh.Cell3DsNumFaces << "\t";
+	
+	for (auto v : mesh.Cell3DsVertices)
+		file3 << v << " ";
+	file3 << "\t";
+	
+	for (auto e : mesh.Cell3DsEdges)
+		file3 << e << " ";
+	file3 << "\t";
+	
+	for (auto f : mesh.Cell3DsFaces)
+		file3 << f << " ";
+	file3 << "\n";
+	file3.close();
+	
+	//Stampa per ParaView
+	std::cout << "Vertici per Paraview:\n";
+	for (std::size_t i = 0 ; i < mesh.NumCell0Ds; ++i){
+		std::cout << mesh.Cell0DsCoordinates(0, i) << " "
+				  << mesh.Cell0DsCoordinates(1, i) << " "
+				  << mesh.Cell0DsCoordinates(2, i) << "\n";
+	}
+	std::cout << "\nLati per ParaView (vertici estremi):\n";
+	for (std::size_t i = 0; i < mesh.NumCell1Ds; ++i){
+		std::cout << mesh.Cell1DsExtrema(0, i) << " "
+				  << mesh.Cell1DsExtrema(1, i) << "\n";
+	}
+	
+	return true;
+}
+
+
 
 bool check_ed_vert(const PolygonalMesh& mesh){
 	for (unsigned int i=0; i<mesh.NumCell2Ds; i++){
