@@ -13,7 +13,7 @@ namespace PolygonalLibrary
 
 bool costruzione_poliedro(int q, PolygonalMesh& mesh);
 
-bool genera_poliedro(int p, int q, int b);
+bool genera_poliedro(PolygonalMesh& mesh, unsigned int num_lati_iniziali, unsigned int num_facce_iniziali);
 
 bool check_ed_vert(const PolygonalMesh& mesh);
 

@@ -19,12 +19,6 @@ int main(int argc, char *argv[]){
 	int id_vertice_2;
 	bool cammino;
 	
-	if (!genera_poliedro(p, q, b)){
-		std::cerr << "Errore nella generazione del poliedro.\n";
-		return 1;
-	}
-	
-	std::cout << "Poliedro generato correttamente.\n";
 	
 	if (argc==5){
 		p = atoi(argv[1]);
@@ -93,6 +87,12 @@ int main(int argc, char *argv[]){
 			
 		}
 		ProiezioneSfera(mesh);
+		if (!genera_poliedro(mesh, num_lati_iniziali,num_facce_iniziali)){
+			cerr << "Errore nella generazione del poliedro"<<endl;
+			return 1;
+		}
+	
+		cout << "Poliedro generato correttamente"<<endl;
 		
 		if (cammino){
 			//Calcolo del cammino minimo
@@ -136,11 +136,20 @@ int main(int argc, char *argv[]){
 			}
 			duale = costruzione_duale(mesh, num_facce_iniziali, num_lati_iniziali);
 			
-			ProiezioneSfera(duale);
-			
 			if (!check_ed_vert(duale)){
 				cerr<<"Errore nel controllo di lati e vertici del poliedro"<<endl;
 			}
+			
+			ProiezioneSfera(duale);
+			
+			if (!genera_poliedro(mesh, 0,0)){
+				cerr << "Errore nella generazione del poliedro"<<endl;
+				return 1;
+			}
+			
+			cout << "Poliedro generato correttamente"<<endl;
+			
+			
 			if (cammino){
 				
 				//Calcolo del cammino minimo

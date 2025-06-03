@@ -116,7 +116,7 @@ bool TrovaCamminoMinimo(PolygonalMesh& mesh, unsigned int id_vertice_1, unsigned
     unsigned int Lunghezza_cammino = 0;
 	
 	//Aggiungo i lati visitati, aggiorno il numero di lati e la distanza totale percorsa
-    for (unsigned int i = 0; i < cammino.size() - 1; ++i) {
+    for (unsigned int i = 0; i < cammino.size() - 1; i++) {
         unsigned int u = cammino[i];
         unsigned int v = cammino[i + 1];
 
