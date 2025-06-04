@@ -91,6 +91,11 @@ int main(int argc, char *argv[]){
 			cerr << "Errore nella generazione del poliedro"<<endl;
 			return 1;
 		}
+		mesh.Cell1DsEsistente.resize(mesh.NumCell1Ds,1);
+		
+		for (unsigned int i=0; i<num_lati_iniziali;i++){
+			mesh.Cell1DsEsistente[i]=0;
+		}
 	
 		cout << "Poliedro generato correttamente"<<endl;
 		
@@ -149,6 +154,7 @@ int main(int argc, char *argv[]){
 			
 			cout << "Poliedro generato correttamente"<<endl;
 			
+			mesh.Cell1DsEsistente.resize(mesh.NumCell1Ds,1);
 			
 			if (cammino){
 				

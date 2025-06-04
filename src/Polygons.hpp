@@ -23,7 +23,8 @@ struct PolygonalMesh
     std::vector<unsigned int> Cell1DsId = {}; ///< Cell1D id, size 1 x NumberCell1D
     Eigen::MatrixXi Cell1DsExtrema = {}; ///< Cell1D vertices indices, size 2 x NumberCell1D (fromId,toId)
     std::vector<unsigned int> Cell1DsShortPath = {}; ///< 1 se l'arco (cella 1D) appartiene al cammino minimo, altrimenti 0
-
+	std::vector<unsigned int> Cell1DsEsistente = {}; ///< 1 se l'arco (cella 1D) va visualizzato su Paraview
+	
 	//Cell2D
     unsigned int NumCell2Ds = 0; ///< number of Cell2D
     std::vector<unsigned int> Cell2DsId = {}; ///< Cell2D id, size 1 x NumberCell2D

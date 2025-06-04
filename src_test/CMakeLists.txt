@@ -1,5 +1,10 @@
-list(APPEND src_test_headers ${CMAKE_CURRENT_SOURCE_DIR}/TestPolygon.hpp)
-list(APPEND src_test_headers ${CMAKE_CURRENT_SOURCE_DIR}/TestTriangle.hpp)
+list(APPEND src_test_headers ${CMAKE_CURRENT_SOURCE_DIR}/calcolo_baricentro_test.hpp)
+list(APPEND src_test_headers ${CMAKE_CURRENT_SOURCE_DIR}/costruzione_duale_test.hpp)
+list(APPEND src_test_headers ${CMAKE_CURRENT_SOURCE_DIR}/EsisteVertice_test.hpp)
+list(APPEND src_test_headers ${CMAKE_CURRENT_SOURCE_DIR}/genera_poliedro_test.hpp)
+list(APPEND src_test_headers ${CMAKE_CURRENT_SOURCE_DIR}/TriangolaFaccia_2_test.hpp)
+list(APPEND src_test_headers ${CMAKE_CURRENT_SOURCE_DIR}/TriangolaFaccia_test.hpp)
+list(APPEND src_test_headers ${CMAKE_CURRENT_SOURCE_DIR}/TrovaCamminoMinimo_test.hpp)
 
 list(APPEND src_test_includes ${CMAKE_CURRENT_SOURCE_DIR})
 

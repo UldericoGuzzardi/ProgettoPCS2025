@@ -19,7 +19,7 @@ Eigen::Vector3d calcolo_baricentro(const PolygonalMesh& mesh, vector<unsigned in
 	Eigen::Vector3d v1= {mesh.Cell0DsCoordinates(0,verts[1]),mesh.Cell0DsCoordinates(1,verts[1]),mesh.Cell0DsCoordinates(2,verts[1])};
 	Eigen::Vector3d v2= {mesh.Cell0DsCoordinates(0,verts[2]),mesh.Cell0DsCoordinates(1,verts[2]),mesh.Cell0DsCoordinates(2,verts[2])};
 	
-	Eigen::Vector3d baricentro = (v0 + v1 +v2)/3.0;
+	Eigen::Vector3d baricentro = (v0 + v1 + v2)/3.0;
 	
 	return baricentro;
 }
