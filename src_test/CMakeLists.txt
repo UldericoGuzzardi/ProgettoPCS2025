@@ -5,6 +5,14 @@ list(APPEND src_test_headers ${CMAKE_CURRENT_SOURCE_DIR}/genera_poliedro_test.hp
 list(APPEND src_test_headers ${CMAKE_CURRENT_SOURCE_DIR}/TriangolaFaccia_2_test.hpp)
 list(APPEND src_test_headers ${CMAKE_CURRENT_SOURCE_DIR}/TriangolaFaccia_test.hpp)
 list(APPEND src_test_headers ${CMAKE_CURRENT_SOURCE_DIR}/TrovaCamminoMinimo_test.hpp)
+list(APPEND src_test_headers ${CMAKE_CURRENT_SOURCE_DIR}/costruzione_poliedro_test.hpp)
+list(APPEND src_test_headers ${CMAKE_CURRENT_SOURCE_DIR}/check_ed_vert_test.hpp)
+list(APPEND src_test_headers ${CMAKE_CURRENT_SOURCE_DIR}/EsisteLato_test.hpp)
+list(APPEND src_test_headers ${CMAKE_CURRENT_SOURCE_DIR}/TriangolazionePoliedro_test.hpp)
+list(APPEND src_test_headers ${CMAKE_CURRENT_SOURCE_DIR}/VerticeInFaccia_test.hpp)
+list(APPEND src_test_headers ${CMAKE_CURRENT_SOURCE_DIR}/ProiezioneSfera_test.hpp)
+list(APPEND src_test_headers ${CMAKE_CURRENT_SOURCE_DIR}/AggiungiFaccia_test.hpp)
+list(APPEND src_test_headers ${CMAKE_CURRENT_SOURCE_DIR}/Esportazione_ParaView_test.hpp)
 
 list(APPEND src_test_includes ${CMAKE_CURRENT_SOURCE_DIR})
 
