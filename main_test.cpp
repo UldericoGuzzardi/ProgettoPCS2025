@@ -7,6 +7,8 @@
 #include "TriangolaFaccia_2_test.hpp"
 #include "TriangolaFaccia_test.hpp"
 #include "TrovaCamminoMinimo_test.hpp"
+#include "costruzione_poliedro_test.hpp"
+#include "check_ed_vert_test.hpp"
 
 int main(int argc, char *argv[])
 {
