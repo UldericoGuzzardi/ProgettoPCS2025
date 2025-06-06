@@ -17,7 +17,6 @@ namespace PolygonalLibrary{
 		
 		//Inizializziamo la matrice degli estremi come vuota
 		mesh.NumCell1Ds = 0;
-		mesh.Cell1DsId.clear();
 		mesh.Cell1DsExtrema.resize(2, 0);
 		
 		//Primo test: inserisco un lato, ad esempio {3, 1} che verrà ordinato in {1, 3}

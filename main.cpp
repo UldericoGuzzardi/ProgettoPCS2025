@@ -130,8 +130,12 @@ int main(int argc, char *argv[]){
 			cerr <<"Errore nel controllo di lati e vertici del poliedro"<<endl;
 			}
 			
-			if (b==1){
+			if (b==1 && c==0){
 				num_facce_iniziali =0;
+				num_lati_iniziali=0;
+				
+			} else if (b==0 && c==1){
+				num_facce_iniziali=0;
 				num_lati_iniziali=0;
 			} else{
 				num_facce_iniziali = mesh.NumCell2Ds;

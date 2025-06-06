@@ -445,7 +445,7 @@ unsigned int EsisteVertice(PolygonalMesh& mesh,const Eigen::Vector3d new_vert){
 	double tol=1e-15;
 
 	//devo confrontare tutti i vertici, quindi itero su NumCell0Ds
-	for (unsigned int i = 0; i < mesh.NumCell0Ds; ++i) {
+	for (unsigned int i = 0; i < mesh.NumCell0Ds; i++) {
         if ((mesh.Cell0DsCoordinates.col(i) - new_vert).norm()<tol) { //Se il vertice esiste, allora restituisco il suo ID (bisogna fare un controllo con la tolleranza?)
             return mesh.Cell0DsId[i];  
         }

@@ -23,11 +23,11 @@ namespace PolygonalLibrary{
 		ASSERT_EQ(mesh.NumCell2Ds, 4);
 		
 		//Verifica delle coordinate dei vertici (Tetraedro inscritto nella sfera unitaria)
-        for (std::size_t i = 0; i < mesh.NumCell0Ds; ++i) {
+        for (unsigned int i = 0; i < mesh.NumCell0Ds; i++) {
             double x = mesh.Cell0DsCoordinates(0, i);
             double y = mesh.Cell0DsCoordinates(1, i);
             double z = mesh.Cell0DsCoordinates(2, i);
-            double norm = std::sqrt(x*x + y*y + z*z);
+            double norm = sqrt(x*x + y*y + z*z);
             EXPECT_NEAR(norm, 1.0, 1e-12);
         }
     }
@@ -46,12 +46,12 @@ namespace PolygonalLibrary{
         ASSERT_EQ(mesh.NumCell2Ds, 8);
 
         // Verifica che ogni vertice sia sulla sfera unitaria
-        for (std::size_t i = 0; i < mesh.NumCell0Ds; ++i) {
+        for (unsigned int i = 0; i < mesh.NumCell0Ds; i++) {
             double x = mesh.Cell0DsCoordinates(0, i);
             double y = mesh.Cell0DsCoordinates(1, i);
             double z = mesh.Cell0DsCoordinates(2, i);
 
-            double norm = std::sqrt(x*x + y*y + z*z);
+            double norm = sqrt(x*x + y*y + z*z);
             EXPECT_NEAR(norm, 1.0, 1e-12);
         }
 	}
@@ -69,12 +69,12 @@ namespace PolygonalLibrary{
         ASSERT_EQ(mesh.NumCell2Ds, 20);
 
         // Verifica che ogni vertice sia sulla sfera unitaria
-        for (std::size_t i = 0; i < mesh.NumCell0Ds; ++i) {
+        for (unsigned int i = 0; i < mesh.NumCell0Ds; i++) {
             double x = mesh.Cell0DsCoordinates(0, i);
             double y = mesh.Cell0DsCoordinates(1, i);
             double z = mesh.Cell0DsCoordinates(2, i);
 
-            double norm = std::sqrt(x*x + y*y + z*z);
+            double norm = sqrt(x*x + y*y + z*z);
             EXPECT_NEAR(norm, 1.0, 1e-12);
         }
 	}
