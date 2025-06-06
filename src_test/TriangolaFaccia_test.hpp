@@ -42,17 +42,17 @@ namespace PolygonalLibrary{
 		for (unsigned int i=0;i<9;i++){
 			mesh_exp.Cell1DsId.push_back(i);
 		}
-		mesh.Cell1DsExtrema = Eigen::MatrixXi(2, mesh_exp.NumCell1Ds);
+		mesh_exp.Cell1DsExtrema = Eigen::MatrixXi(2, mesh_exp.NumCell1Ds);
 		
-		mesh.Cell1DsExtrema.col(0) << 0, 1;
-		mesh.Cell1DsExtrema.col(1) << 1, 3;
-		mesh.Cell1DsExtrema.col(2) << 0, 3;
-		mesh.Cell1DsExtrema.col(3) << 1, 4;
-		mesh.Cell1DsExtrema.col(4) << 3, 4;
-		mesh.Cell1DsExtrema.col(5) << 1, 2;
-		mesh.Cell1DsExtrema.col(5) << 2, 4;
-		mesh.Cell1DsExtrema.col(7) << 4, 5;
-		mesh.Cell1DsExtrema.col(8) << 3, 5;
+		mesh_exp.Cell1DsExtrema.col(0) << 0, 1;
+		mesh_exp.Cell1DsExtrema.col(1) << 1, 3;
+		mesh_exp.Cell1DsExtrema.col(2) << 0, 3;
+		mesh_exp.Cell1DsExtrema.col(3) << 1, 4;
+		mesh_exp.Cell1DsExtrema.col(4) << 3, 4;
+		mesh_exp.Cell1DsExtrema.col(5) << 1, 2;
+		mesh_exp.Cell1DsExtrema.col(6) << 2, 4;
+		mesh_exp.Cell1DsExtrema.col(7) << 4, 5;
+		mesh_exp.Cell1DsExtrema.col(8) << 3, 5;
 		
 		//Cell2Ds
 		mesh_exp.NumCell2Ds=4;
@@ -75,14 +75,15 @@ namespace PolygonalLibrary{
 		
 		vector<unsigned int> e1 = {0,1,2};
 		vector<unsigned int> e2 = {3,4,1};
-		vector<unsigned int> e3 = {5,6,4};
+		vector<unsigned int> e3 = {5,6,3};
 		vector<unsigned int> e4 = {4,7,8};
 		
-		mesh.Cell2DsEdges = {e1, e2, e3, e4};
-
+		mesh_exp.Cell2DsEdges = {e1, e2, e3, e4};
+		
+		double tol=1e-10;
 		EXPECT_EQ(mesh.NumCell0Ds,6);
 		for (unsigned int i=0; i< 6;i++){
-			EXPECT_EQ(mesh.Cell0DsCoordinates.col(i),mesh_exp.Cell0DsCoordinates.col(i));
+			EXPECT_TRUE((mesh.Cell0DsCoordinates.col(i)-mesh_exp.Cell0DsCoordinates.col(i)).norm()<tol);
 		}
 		
 		EXPECT_EQ(mesh.NumCell1Ds,9);
