@@ -133,7 +133,10 @@ bool TrovaCamminoMinimo(PolygonalMesh& mesh, unsigned int id_vertice_1, unsigned
                 break;
             }
         }
+		
     }
+	
+
 
     cout << "Numero di archi nel cammino: " << Lunghezza_cammino << endl;
     cout << "Lunghezza totale: " << Lunghezza_tot << endl;
