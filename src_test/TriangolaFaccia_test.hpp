@@ -11,7 +11,7 @@ namespace PolygonalLibrary{
 	//La funzione triangola faccia dovrebbe funzionare anche nel caso di mesh vuota. Essa infatti utilizza le funzioni EsisteVertice ed EsisteLato
 	//Per generare nuovi vertici e lati
 	//Affinchè abbia senso, la faccia che passiamo alla funzione deve essere un triangolo equilatero.
-	TEST(TestPoliedri,TestTriangolaFaccia)
+	TEST(TestTriangolazionePoliedro,TestTriangolaFaccia)
 	{
 	
 		PolygonalMesh mesh;
