@@ -12,7 +12,6 @@ list(APPEND src_test_headers ${CMAKE_CURRENT_SOURCE_DIR}/TriangolazionePoliedro_
 list(APPEND src_test_headers ${CMAKE_CURRENT_SOURCE_DIR}/VerticeInFaccia_test.hpp)
 list(APPEND src_test_headers ${CMAKE_CURRENT_SOURCE_DIR}/ProiezioneSfera_test.hpp)
 list(APPEND src_test_headers ${CMAKE_CURRENT_SOURCE_DIR}/AggiungiFaccia_test.hpp)
-list(APPEND src_test_headers ${CMAKE_CURRENT_SOURCE_DIR}/Esportazione_ParaView_test.hpp)
 
 list(APPEND src_test_includes ${CMAKE_CURRENT_SOURCE_DIR})
 
