@@ -1,0 +1,37 @@
+@startuml
+
+
+package "PolygonalLibrary" {
+    
+    class PolygonalMesh {
+        ..Cell0Ds..
+        +unsigned int NumCell0Ds
+        +vector<unsigned int> Cell0DsId
+        +Eigen::MatrixXd Cell0DsCoordinates
+        +vector<unsigned int> Cell0DsShortPath
+
+        ..Cell1Ds..
+        +unsigned int NumCell1Ds
+        +vector<unsigned int> Cell1DsId
+        +Eigen::MatrixXi Cell1DsExtrema
+        +vector<unsigned int> Cell1DsShortPath
+        +vector<unsigned int> Cell1DsEsistente
+
+        ..Cell2Ds..
+        +unsigned int NumCell2Ds
+        +vector<unsigned int> Cell2DsId
+        +vector<unsigned int> Cell2DsNumVert
+        +vector<unsigned int> Cell2DsNumEdg
+        +vector<vector<unsigned int>> Cell2DsVertices
+        +vector<vector<unsigned int>> Cell2DsEdges
+    }
+
+    note right of PolygonalMesh
+        Rappresenta un poligono costituito da:
+        - Cell0D (vertici)
+        - Cell1D (lati)
+        - Cell2D (facce)
+    end note
+}
+
+@enduml
