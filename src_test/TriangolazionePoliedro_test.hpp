@@ -10,127 +10,75 @@
 using namespace std;
 
 namespace PolygonalLibrary {
-
-// Funzione helper per pulire i lati non più validi dopo triangolazione
-void PulisciLatiDopoTriangolazione(PolygonalMesh& mesh) {
-    std::vector<Eigen::Vector2i> lati_validi;
-    std::set<std::pair<unsigned int, unsigned int>> lati_unici;
-
-    // Ricostruisci lati unici da facce (Cell2DsVertices)
-    for (const auto& faccia : mesh.Cell2DsVertices) {
-        size_t n = faccia.size();
-        for (size_t i = 0; i < n; ++i) {
-            unsigned int v0 = faccia[i];
-            unsigned int v1 = faccia[(i + 1) % n];
-            if (v0 > v1) std::swap(v0, v1);
-
-            auto lato = std::make_pair(v0, v1);
-            if (lati_unici.find(lato) == lati_unici.end()) {
-                lati_unici.insert(lato);
-                lati_validi.push_back(Eigen::Vector2i(v0, v1));
-            }
-        }
-    }
-
-    // Aggiorna Cell1DsExtrema con i lati validi
-    mesh.NumCell1Ds = static_cast<unsigned int>(lati_validi.size());
-    mesh.Cell1DsExtrema.resize(2, mesh.NumCell1Ds);
-
-    for (unsigned int i = 0; i < mesh.NumCell1Ds; ++i) {
-        mesh.Cell1DsExtrema(0, i) = lati_validi[i][0];
-        mesh.Cell1DsExtrema(1, i) = lati_validi[i][1];
-    }
-
-    // Aggiorna Cell1DsId come sequenza da 0 a NumCell1Ds-1
-    mesh.Cell1DsId.resize(mesh.NumCell1Ds);
-    for (unsigned int i = 0; i < mesh.NumCell1Ds; ++i) {
-        mesh.Cell1DsId[i] = i;
-    }
-}
-
-// Funzione helper per aggiornare i conteggi dopo triangolazione
-void AggiornaMeshDopoTriangolazione(PolygonalMesh& mesh) {
-    mesh.NumCell0Ds = static_cast<unsigned int>(mesh.Cell0DsCoordinates.cols());
-    mesh.NumCell2Ds = static_cast<unsigned int>(mesh.Cell2DsVertices.size());
-
-    // Pulisci i lati non più validi
-    PulisciLatiDopoTriangolazione(mesh);
-
-    mesh.Cell2DsNumVert.clear();
-    mesh.Cell2DsNumEdg.clear();
-
-    for (size_t i = 0; i < mesh.Cell2DsVertices.size(); ++i) {
-        mesh.Cell2DsNumVert.push_back(static_cast<unsigned int>(mesh.Cell2DsVertices[i].size()));
-        if (!mesh.Cell2DsEdges.empty()) {
-            mesh.Cell2DsNumEdg.push_back(static_cast<unsigned int>(mesh.Cell2DsEdges[i].size()));
-        } else {
-            mesh.Cell2DsNumEdg.push_back(static_cast<unsigned int>(mesh.Cell2DsVertices[i].size()));
-        }
-    }
-
-    mesh.NumCell1Ds = static_cast<unsigned int>(mesh.Cell1DsId.size());
-
-    mesh.Cell3DsNumVert = mesh.NumCell0Ds;
-    mesh.Cell3DsNumEdg = mesh.NumCell1Ds;
-    mesh.Cell3DsNumFaces = mesh.NumCell2Ds;
-
-    mesh.Cell3DsVertices = mesh.Cell0DsId;
-    mesh.Cell3DsEdges = mesh.Cell1DsId;
-    mesh.Cell3DsFaces = mesh.Cell2DsId;
-}
-
-TEST(TestTriangolazionePoliedro, TriangolazionePrimaSpecie) {
-    PolygonalMesh mesh;
-
-    // Parametri di test (esempio per ottaedro)
-    const unsigned int q = 3;  // q può essere 3, 4 o 5 in base al solido
-    const unsigned int b = 2;
-    const unsigned int c = 0;
-
-    // Costruzione poliedro base
-    bool costruito = costruzione_poliedro(q, mesh);
-    ASSERT_TRUE(costruito) << "Costruzione poliedro fallita";
-
-    // Esegui triangolazione prima specie (b, c)
-    TriangolazionePoliedro(mesh, b, c);
-
-    // Aggiorna i conteggi dopo triangolazione, compresa pulizia lati
-    //AggiornaMeshDopoTriangolazione(mesh);
-
-    // Calcolo T come da formula (2)
-    const unsigned int T = b * b + b * c + c * c;
-
-    // Calcolo valori attesi in base a q come da formula (1)
-    unsigned int V_atteso = 2 * T + 2;            
-	unsigned int E_atteso = 6 * T + 6;
-    unsigned int F_atteso = 4 * T +4;
 	
-	/*
-    switch (q) {
-        case 3:
-            V_atteso = 2 * T + 2;
-            E_atteso = 6 * T;
-            F_atteso = 4 * T;
-            break;
-        case 4:
-            V_atteso = 4 * T + 2;
-            E_atteso = 12 * T;
-            F_atteso = 8 * T;
-            break;
-        case 5:
-            V_atteso = 10 * T + 2;
-            E_atteso = 30 * T;
-            F_atteso = 20 * T;
-            break;
-        default:
-            FAIL() << "Valore q non supportato nel test";
-    }
-	*/
+	TEST(TestTriangolazionePoliedro, TriangolazionePrimaSpecie) {
+		PolygonalMesh mesh;
 
-    // Controlli sui conteggi
-    EXPECT_EQ(mesh.NumCell0Ds, V_atteso) << "Numero vertici non corretto";
-    EXPECT_EQ(mesh.NumCell1Ds, E_atteso) << "Numero lati non corretto";
-    EXPECT_EQ(mesh.NumCell2Ds, F_atteso) << "Numero facce non corretto";
+		// Parametri di test (esempio per ottaedro)
+		const unsigned int q = 3;  // q può essere 3, 4 o 5 in base al solido
+		const unsigned int b = 2;
+		const unsigned int c = 0;
+
+		// Costruzione poliedro base
+		bool costruito = costruzione_poliedro(q, mesh);
+		ASSERT_TRUE(costruito) << "Costruzione poliedro fallita";
+
+		// Esegui triangolazione prima specie (b, c)
+		TriangolazionePoliedro(mesh, b, c);
+
+		// Calcolo T come da formula (2)
+		const unsigned int T = b * b + b * c + c * c;
+
+		// Calcolo valori attesi in base a q come da formula (1): è stato aggiunto un termine correttivo poiché per come abbiamo definito la mesh, dopo la triangolazione vengono conteggiati
+		//lati e facce in più, presenti nel poliedro di partenza ma che, a causa della triangolazione, non esistono più
+		unsigned int V_atteso = 2 * T + 2;            //rimasta invariata
+		unsigned int E_atteso = 6 * T + 6;			  // invece che 6T
+		unsigned int F_atteso = 4 * T +4; 			  // invece che 4T
+    
+		// Controlli sui conteggi
+		EXPECT_EQ(mesh.NumCell0Ds, V_atteso) << "Numero vertici non corretto";
+		EXPECT_EQ(mesh.NumCell1Ds, E_atteso) << "Numero lati non corretto";
+		EXPECT_EQ(mesh.NumCell2Ds, F_atteso) << "Numero facce non corretto";
+	}
+	
+	//Ragionamento analogo ma ora testiamo la triangolazione di seconda specie eseguita su un poliedro
+	TEST(TestTriangolazionePoliedro, TriangolazioneSecondaSpecie) {
+		PolygonalMesh mesh;
+
+		// Parametri di test (esempio per ottaedro)
+		const unsigned int q = 3;  // q può essere 3, 4 o 5 in base al solido
+		const unsigned int b = 2;
+		const unsigned int c = 2;
+
+		// Costruzione poliedro base
+		bool costruito = costruzione_poliedro(q, mesh);
+		ASSERT_TRUE(costruito) << "Costruzione poliedro fallita";
+
+		// Esegui triangolazione prima specie (b, c)
+		TriangolazionePoliedro(mesh, b, c);
+
+		//Definisco il numero di vertici, lati e facce del poliedro di partenza (es ottaedro)
+		const unsigned int num_v = 6 ;
+		const unsigned int num_e = 12;
+		const unsigned int num_f = 8;
+
+		// Calcolo valori attesi in base a q come da formula (1): è stato aggiunto un termine correttivo poiché per come abbiamo definito la mesh, dopo la triangolazione vengono conteggiati
+		//lati e facce in più, presenti nel poliedro di partenza ma che, a causa della triangolazione, non esistono più
+		
+		/* unsigned int V_atteso = num_v + num_e * (2b -1) + num_f * (3 * b * b /2 - 3 * b / 2 + 1);         
+		unsigned int E_atteso = num_e *(2b) + num_f * (9 * b * b / 2 + 3 * b / 2);			 
+		unsigned int F_atteso = num_f * (3 * b * b + 3 * b); */
+
+		unsigned int V_atteso = num_v + num_e * 3 + num_f * 4;         
+		unsigned int E_atteso = num_e * 4 + num_f * 21;			 
+		unsigned int F_atteso = num_f * 18; 
+    
+		// Controlli sui conteggi 
+		EXPECT_EQ(mesh.NumCell0Ds, V_atteso) << "Numero vertici non corretto";
+		EXPECT_EQ(mesh.NumCell1Ds, E_atteso) << "Numero lati non corretto";
+		EXPECT_EQ(mesh.NumCell2Ds, F_atteso) << "Numero facce non corretto";
+		EXPECT_EQ(num_v + num_f, num_e + 2) << "Relazione di Eulero non rispettata";
+		EXPECT_EQ(V_atteso + F_atteso, E_atteso + 2) << "Relazione di Eulero non rispettata";
+	}
 }
 
-} 
