@@ -24,6 +24,16 @@ package "PolygonalLibrary" {
         +vector<unsigned int> Cell2DsNumEdg
         +vector<vector<unsigned int>> Cell2DsVertices
         +vector<vector<unsigned int>> Cell2DsEdges
+       
+       ..Cell3Ds..
+       +unsigned int NumCell3Ds
+       +unsigned int Cell3DsId 
+       +unsigned int Cell3DsNumVert
+       +unsigned int Cell3DsNumEdg
+       +unsigned int Cell3DsNumFaces
+       +vector<unsigned int> Cell3DsVertices
+       +vector<unsigned int> Cell3DsEdges
+       +vector<unsigned int> Cell3DsFaces
     }
 
     note right of PolygonalMesh

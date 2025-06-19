@@ -1,0 +1,67 @@
+@startuml
+
+
+title Triangolazione Prima Classe
+
+start
+   :Per ogni faccia del poliedro;
+
+   note right
+   O(n)
+   end note
+
+   repeat
+   :Individo i tre vertici;
+   :Costruisco per "strati"; 
+
+   note left
+   vector<vector<unsigned int>> strati_vertici
+   end note
+
+   :Salvo i nuovi vertici nella mesh;
+   note right
+   O(b^2)
+   end note   
+
+   :Evito duplicati tramite la funzione EsisteVertice;
+
+   note left
+   O(n)
+   end note
+
+   :Costruisco le nuove facce tramite i vertici;
+   :Prendo 4 vertici tra due strati; 
+
+   note right
+   Iterando su strati_vertici, prendo due vertici da uno
+   strato e due da quello superiore, costruisco virtualmente 
+   un parallelogramma che divido in due triangoli
+   end note
+
+   :Aggiungo le due facce al poliedro;
+
+   note left
+   Sto aggiungendo solo i vertici
+   end note 
+
+   :Creo contemporaneamente i nuovi lati e le facce che formano;
+   :Uso la funzione EsisteLato;
+
+   note right
+   O(n)
+   end note
+
+   if (Il lato esiste già?) then (sì)
+     :Recupero il suo ID;
+
+   else (no)
+     :Lo aggiungo al poliedro e restituisco il suo ID;
+
+   endif
+   :Aggiungo il lato alla faccia;
+   
+   repeat while (Sono all'ultima faccia?) is (no)
+   :Aggiorno le celle 3D;
+stop
+
+@enduml
