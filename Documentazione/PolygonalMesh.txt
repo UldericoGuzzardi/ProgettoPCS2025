@@ -3,7 +3,7 @@
 
 package "PolygonalLibrary" {
     
-    class PolygonalMesh {
+    struct PolygonalMesh {
         ..Cell0Ds..
         +unsigned int NumCell0Ds
         +vector<unsigned int> Cell0DsId
@@ -31,6 +31,12 @@ package "PolygonalLibrary" {
         - Cell0D (vertici)
         - Cell1D (lati)
         - Cell2D (facce)
+    end note
+
+    note left of PolygonalMesh
+        Utilizza:
+        - STL (vector)
+        - Eigen (MatrixXd, MatrixXi)
     end note
 }
 
