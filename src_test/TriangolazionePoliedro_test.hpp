@@ -65,14 +65,16 @@ namespace PolygonalLibrary {
 		// Calcolo valori attesi in base a q come da formula (1): è stato aggiunto un termine correttivo poiché per come abbiamo definito la mesh, dopo la triangolazione vengono conteggiati
 		//lati e facce in più, presenti nel poliedro di partenza ma che, a causa della triangolazione, non esistono più
 		
-		/* unsigned int V_atteso = num_v + num_e * (2b -1) + num_f * (3 * b * b /2 - 3 * b / 2 + 1);         
-		unsigned int E_atteso = num_e *(2b) + num_f * (9 * b * b / 2 + 3 * b / 2);			 
+		/* unsigned int V_atteso = num_v + num_e * (2*b -1) + num_f * (3 * b * b /2 - 3 * b / 2 + 1);         
+		unsigned int E_atteso = num_e *(2*b) + num_f * (9 * b * b / 2 + 3 * b / 2);			 
 		unsigned int F_atteso = num_f * (3 * b * b + 3 * b); */
+		
+		//C'è necessità di adattare le formule alla struttura delle nostre funzioni e delle nostre mesh
+		// La funzione TriangolaFaccia_2 suddivide ogni faccia in b^2 triangoli con una griglia regolare di punti, ma questo cambia anche il numero di vertici e spigoli rispetto alle formule generiche
+		unsigned int V_atteso = num_v + num_e * (2 * b - 1) + num_f * ((b - 1) * (b - 2) / 2);
+		unsigned int F_atteso = num_f * 3 * b * b;
+		unsigned int E_atteso = V_atteso + F_atteso - 2;
 
-		unsigned int V_atteso = num_v + num_e * 3 + num_f * 4;         
-		unsigned int E_atteso = num_e * 4 + num_f * 21;			 
-		unsigned int F_atteso = num_f * 18; 
-    
 		// Controlli sui conteggi 
 		EXPECT_EQ(mesh.NumCell0Ds, V_atteso) << "Numero vertici non corretto";
 		EXPECT_EQ(mesh.NumCell1Ds, E_atteso) << "Numero lati non corretto";
