@@ -37,7 +37,7 @@ bool TrovaCamminoMinimo(PolygonalMesh& mesh, unsigned int id_vertice_1, unsigned
 
 void AggiungiFaccia(PolygonalMesh& mesh, vector<unsigned int> faccia);
 
-void TriangolaFaccia_2(PolygonalMesh& mesh, Eigen::Vector3d v0, Eigen::Vector3d v1, Eigen::Vector3d v2, unsigned int b, unsigned int num_facce_iniziali);
+void TriangolaFaccia_2(PolygonalMesh& mesh, Eigen::Vector3d v0, Eigen::Vector3d v1, Eigen::Vector3d v2, unsigned int b);
 
 void Esportazione_ParaView(PolygonalMesh& mesh, bool cammino);
 

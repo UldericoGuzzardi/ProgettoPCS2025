@@ -24,7 +24,6 @@ start
    end note   
 
    :Evito duplicati tramite la funzione EsisteVertice;
-
    note left
    O(n)
    end note

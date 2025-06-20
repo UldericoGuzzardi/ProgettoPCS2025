@@ -18,7 +18,7 @@ namespace PolygonalLibrary{
 		Eigen::Vector3d v_0={1,0,0};
 		Eigen::Vector3d v_1={0,1,0};
 		Eigen::Vector3d v_2={0,0,1};
-		TriangolaFaccia_2(mesh,v_0,v_1,v_2,b,0);
+		TriangolaFaccia_2(mesh,v_0,v_1,v_2,b);
 	
 		//Costruisco l'output che mi aspetto su un'altra mesh
 		PolygonalMesh mesh_exp;

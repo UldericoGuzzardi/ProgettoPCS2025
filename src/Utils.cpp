@@ -634,7 +634,7 @@ void TriangolazionePoliedro(PolygonalMesh& mesh, unsigned int b, unsigned int c)
 				TriangolaFaccia(mesh, v0, v1, v2, c);
 			}
 		} else{
-			TriangolaFaccia_2(mesh,v0,v1,v2,b,num_facce);
+			TriangolaFaccia_2(mesh,v0,v1,v2,b);
 		}
 
 	}

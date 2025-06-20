@@ -18,8 +18,9 @@ void AggiungiFaccia(PolygonalMesh& mesh, vector<unsigned int> faccia){
 	mesh.Cell2DsNumVert.push_back(3);
 	mesh.NumCell2Ds++;
 }
-void TriangolaFaccia_2(PolygonalMesh& mesh, Eigen::Vector3d v0, Eigen::Vector3d v1, Eigen::Vector3d v2, unsigned int b, unsigned int num_facce_iniziali){
+void TriangolaFaccia_2(PolygonalMesh& mesh, Eigen::Vector3d v0, Eigen::Vector3d v1, Eigen::Vector3d v2, unsigned int b){
 	
+	unsigned int num_facce_iniziali= mesh.NumCell2Ds; //Serve alla fine per aggiungere i lati alle facce
 	//I vertici vengono assegnati a tre "categorie" diverse:
 	
 	//1. vertici "normali", sono i vertici della triangolazione di classe 1, che vengono generati anche nella triangolazione di classe 2
