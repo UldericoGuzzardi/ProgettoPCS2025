@@ -108,9 +108,6 @@ int main(int argc, char *argv[]){
 		}
 		
 		Esportazione_ParaView(mesh, cammino);
-		return 0;
-		
-		
 		
 		
 	} else {

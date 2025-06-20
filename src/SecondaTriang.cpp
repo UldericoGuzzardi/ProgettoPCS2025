@@ -115,7 +115,7 @@ void TriangolaFaccia_2(PolygonalMesh& mesh, Eigen::Vector3d v0, Eigen::Vector3d 
 		//Costruisco il primo strato
 		vector<unsigned int> primo_strato;
 		
-		vector<unsigned int> base= strati_vertici[0];
+		vector<unsigned int> base= strati_vertici[0]; //è il primo strato del vettore di vettori "strati_vertici"
 		
 		for (unsigned int i=0; i<base.size()-1; i++){
 			Eigen::Vector3d v0=mesh.Cell0DsCoordinates.col(base[i]);

@@ -404,7 +404,7 @@ bool check_ed_vert(const PolygonalMesh& mesh){
 			unsigned int next_ed_id = mesh.Cell2DsEdges[i][(j+1)%(mesh.Cell2DsEdges[i]).size()];
 			unsigned int count =0;
 			
-			//Controllo Lati
+			//Controllo Lati (due lati consecutivi hanno in comune uno e un solo vertice)
 			if (mesh.Cell1DsExtrema(0,ed_id) == mesh.Cell1DsExtrema(0,next_ed_id))
 				count++;
 			if (mesh.Cell1DsExtrema(0,ed_id) == mesh.Cell1DsExtrema(1,next_ed_id))
@@ -419,7 +419,7 @@ bool check_ed_vert(const PolygonalMesh& mesh){
 				return false;
 			}
 			
-			// Controllo Vertici
+			// Controllo Vertici-Lati (Corrispondenza tra lati e vertici nelle facce) 
 			if (vert_id == mesh.Cell1DsExtrema(0,ed_id))
 				count++;
 			if (vert_id == mesh.Cell1DsExtrema(1,ed_id))
@@ -621,8 +621,6 @@ void TriangolazionePoliedro(PolygonalMesh& mesh, unsigned int b, unsigned int c)
 	
 	for (unsigned int i=0; i<num_facce; i++){ //per ogni faccia, salvo i vertici, i lati e le nuove facce della triangolazione
 		
-		//cout<<"Faccia"<< i<<":"<<endl;
-		//cout<<endl;
 		unsigned int id_0 = mesh.Cell2DsVertices[i][0];
 		unsigned int id_1 = mesh.Cell2DsVertices[i][1];
 		unsigned int id_2 = mesh.Cell2DsVertices[i][2];
