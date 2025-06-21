@@ -1,0 +1,55 @@
+@startuml
+
+
+title Il Codice
+
+start
+  :Lettura di N parametri in input;
+  
+  :Costruzione del solido platonico; 
+  note right
+  Dipende dai valori di p e q
+  end note
+
+  :Triangolazione;
+
+   if (b=c) then (no)
+     :Triangolazione I Classe;
+
+   else (sì)
+     :Triangolazione II Classe;
+
+   endif
+
+   :Duale;
+   if (p=3) then (sì)
+     :Non costruisco il duale;
+
+   else (no)
+     :Costruisco il duale; 
+
+   endif
+
+   :Proiezione sulla sfera;
+   :Esportazione del poliedro su file txt;
+   :Cammino minimo;
+      if (N=6) then (sì)
+     :Calcolo il cammino minimo;
+     note left
+     Dijkstra
+     end note
+
+   else (no)
+     :Non calcolo il cammino minimo; 
+
+   endif
+
+   :Esportazione per Paraview;
+   note right
+   Gedim::UCDUtilities
+   Gedim::UCDProperty
+   end note
+  
+stop
+
+@enduml

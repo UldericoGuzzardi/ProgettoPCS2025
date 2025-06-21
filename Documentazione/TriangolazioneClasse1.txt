@@ -10,8 +10,15 @@ start
    O(n)
    end note
 
+  
    repeat
-   :Individo i tre vertici;
+
+   :Individo le coordinate dei tre vertici;
+
+   :Funzione TriangolaFaccia;
+   note left
+   (mesh,v0,v1,v2,b)
+   end note
    :Costruisco per "strati"; 
 
    note left

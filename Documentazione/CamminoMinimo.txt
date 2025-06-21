@@ -1,0 +1,51 @@
+@startuml
+
+
+title Cammino Minimo
+
+start
+  :TrovaCamminoMinimo;
+  note right
+  (mesh,id_vertice_1,id_vertice_2,num_lati_iniziali)
+  end note
+
+  :Controllo validità degli id dei vertici;
+
+  :Dijkstra;
+  note left
+  cammini pesati con pesi positivi 
+  (lunghezza dei lati)
+  end note
+
+  :Costruzione lista di adiacenza;
+  note right
+  vector<vector<pair<unsigned int, double>>> LA
+  end note  
+
+  :Inizializzazione;
+  note left
+  - Vettore delle distanze
+  - Vettore dei predecessori
+  - Vettore dei vertici visitati
+  end note
+
+  :Priority queue;
+  note right
+  std::priority_queue<pair<double,unsigned int>,
+                            vector<pair<double, unsigned int>>, 
+                            greater<pair<double, unsigned int>>>
+  end note
+  
+  :Costruzione del cammino;
+  :Calcolo numero totale di archi;
+  :Calcolo lunghezza totale percorsa;
+
+  :Assegno la proprietà Shortpath ai 
+        lati e ai vertici attraversati;
+  
+  note left
+  Andranno esportate e 
+  visualizzate su ParaView
+  end note
+
+stop

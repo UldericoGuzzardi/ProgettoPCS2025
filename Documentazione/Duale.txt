@@ -1,0 +1,57 @@
+@startuml
+
+
+title Duale
+
+start
+
+   :Funzione costruzione_duale;
+   note right
+   (mesh,num_lati_iniziali,num_facce_iniziali)
+   end note
+
+   :Calcolo dei baricentri delle facce dal poliedro originale;
+
+   note left
+   i baricentri saranno i nuovi vertici del duale
+   end note
+
+   :Aggiungo gli ID e le coordinate 
+            dei vertici al duale;
+   :Costruzione dei lati;
+
+   :Creo una mappa lati-facce;
+
+   note right
+   map<vector<unsigned int>, vector<unsigned int>>
+   associa ad ogni lato la coppia di facce che lo contiene
+   end note
+
+   :Aggiungo i lati al duale;
+
+   note right
+   Uso gli ID delle facce come nuovi estremi del lato
+   end note
+
+   :Costruzione delle facce del duale
+    partendo dai vertici del poliedro;
+   :Per ogni vertice;
+
+   repeat
+   :Costruisco la lista di facce che lo contengono;
+   
+   :Costruisco una mappa faccia-facce;
+   note left
+   map<unsigned int, vector<unsigned int>>
+   associa ad ogni faccia le facce adiacenti che contengono il vertice
+   serve a ordinare i baricentri
+   end note
+   
+   :Ordino i baricentri;
+   :Costruisco e aggiungo la nuova faccia;
+   repeat while (Sono all'ultima faccia?) is (no)
+   :Aggiorno le celle 3D;
+
+stop
+
+@enduml

@@ -11,7 +11,12 @@ start
    end note
 
    repeat
-   :Individo i tre vertici;
+   :Individo le coordinate dei tre vertici;
+
+   :TriangolaFaccia_2;
+   note left
+   (mesh,v0,v1,v2,b)
+   end note
    :Costruisco i nuovi vertici della triangolazione;
    :Assegno ai vertici tre "categorie";
 
