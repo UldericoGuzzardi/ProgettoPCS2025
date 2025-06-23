@@ -95,7 +95,7 @@ namespace PolygonalLibrary{
 			mesh_exp.Cell2DsNumEdg.push_back(3);
 		}
 		
-mesh_exp.Cell2DsVertices.reserve(mesh_exp.NumCell2Ds);
+		mesh_exp.Cell2DsVertices.reserve(mesh_exp.NumCell2Ds);
 		
 		vector<unsigned int> v1 = {6,0,10};
 		vector<unsigned int> v2 = {6,0,12};

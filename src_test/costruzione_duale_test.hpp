@@ -102,10 +102,6 @@ namespace PolygonalLibrary{
 			EXPECT_EQ(duale.Cell2DsEdges[i],duale_exp.Cell2DsEdges[i]);
 			EXPECT_EQ(duale.Cell2DsId[i],duale_exp.Cell2DsId[i]);
 		}	
-		
-		
 	}
-	
-	
 	
 }

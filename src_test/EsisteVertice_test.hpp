@@ -49,16 +49,5 @@ namespace PolygonalLibrary{
 		EXPECT_EQ(mesh.NumCell0Ds, 2);
 		EXPECT_EQ(mesh.Cell0DsId.size(), 2);
 		EXPECT_TRUE((mesh.Cell0DsCoordinates.col(id_4)-vert).norm()<tol);
-		
-	
-		
-		
-		
-		
 	}
-	
-	
-	
-	
-	
 }
