@@ -155,7 +155,7 @@ int main(int argc, char *argv[]){
 			
 			cout << "Poliedro generato correttamente"<<endl;
 			
-			duale.Cell1DsEsistente.resize(mesh.NumCell1Ds,1);
+			duale.Cell1DsEsistente.resize(duale.NumCell1Ds,1);
 			
 			if (cammino){
 				

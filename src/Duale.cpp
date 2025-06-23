@@ -42,6 +42,7 @@ PolygonalMesh costruzione_duale(const PolygonalMesh& mesh, unsigned int num_facc
 	duale.NumCell0Ds = mesh.NumCell2Ds - num_facce_iniziali;
 	duale.Cell0DsCoordinates = Eigen::MatrixXd::Zero(3, duale.NumCell0Ds);
 	
+	//Inserimento dei vertici nel duale
 	for (unsigned int i=0; i<duale.NumCell0Ds; i++){ 
 		duale.Cell0DsId.push_back(i);
 		Eigen::Vector3d baricentro = calcolo_baricentro(mesh, mesh.Cell2DsVertices[num_facce_iniziali+i]);
@@ -73,6 +74,7 @@ PolygonalMesh costruzione_duale(const PolygonalMesh& mesh, unsigned int num_facc
 											//Ricorda che ogni lato appartiene a due facce
 									
 		//Salvo gli ID delle facce per poi usarli come estremi del lato. Gli ID sono già ordinati in ordine crescente
+		
 		unsigned int v1 = facce[0]; 
         unsigned int v2 = facce[1];
 		duale.Cell1DsId.push_back(id_lato);
@@ -105,7 +107,7 @@ PolygonalMesh costruzione_duale(const PolygonalMesh& mesh, unsigned int num_facc
 	// Costruzione facce duali per ogni vertice originale
 	for (unsigned int i = 0; i < mesh.NumCell0Ds; i++) {
 		vector<unsigned int> facce = vertici_facce[i]; //prendo la lista di facce che hanno i come vertice
-		if (facce.size() < 3) continue; // Non formano una faccia chiusa
+		//if (facce.size() < 3) continue; // Non formano una faccia chiusa
 
 		// Costruisco una mappa che ad ogni faccia triangolare del poliedro associa le facce adiacenti ad essa lungo un lato che contiene il vertice i
 		map<unsigned int, vector<unsigned int>> adiacenti;
@@ -125,7 +127,7 @@ PolygonalMesh costruzione_duale(const PolygonalMesh& mesh, unsigned int num_facc
 
 					if (v1 != i && v2 != i) continue; // deve contenere il vertice i
 
-					vector<unsigned int> lato = {std::min(v1, v2), std::max(v1, v2)}; //riscrivo il lato che contiene il vertice i e un altro vertice
+					vector<unsigned int> lato = {min(v1, v2), max(v1, v2)}; //riscrivo il lato che contiene il vertice i e un altro vertice
 					vector<unsigned int> facce_adiacenti = lati_facce[lato]; //prendo le facce adiacenti che hanno quel lato
 					
 					//ciclo sulle due facce adiacenti al lato
